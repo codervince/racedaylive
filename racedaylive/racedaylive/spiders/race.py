@@ -1,18 +1,22 @@
 import re
 
 import scrapy
-
+from scrapy import log
 from racedaylive import items
-
+from datetime import datetime
 
 class RaceSpider(scrapy.Spider):
 
     name = 'race'
     allowed_domains = ['racing.scmp.com', 'hkjc.com']
-
+    count_all_horse_requests = 0
+    count_unique_horse_request = 0
+    code_set = set()
+    
     def __init__(self, racedate, coursecode, *args, **kwargs):
         assert coursecode in ['ST', 'HV']
         assert len(racedate) == 8 and racedate[:2] == '20'
+        
         super(RaceSpider, self).__init__(*args, **kwargs)
         self.hkjc_domain = 'racing.hkjc.com'
         self.after_login_url = 'http://{domain}/racing/Info/Meeting/RaceCard'\
@@ -44,7 +48,10 @@ class RaceSpider(scrapy.Spider):
             ) for path in race_paths
         ] + [response.url]
         for url in urls:
-            racenumber = '0{}'.format(url.split('/')[-1])
+            if int(url.split('/')[-1]) > 9:
+                racenumber = '{}'.format(url.split('/')[-1])
+            else:
+                racenumber = '0{}'.format(url.split('/')[-1])
             request = scrapy.Request(url, callback=self.parse_race)
             request.meta['racenumber'] = racenumber
             yield request
@@ -65,6 +72,10 @@ class RaceSpider(scrapy.Spider):
             horsecode_ = tr.xpath('td[4]/a/@href').extract()[0]
             horsecode = re.match(r"^[^\?]+\?horseno=(?P<code>\w+)'.*$",
                 horsecode_).groupdict()['code']
+            self.code_set.add(horsecode)
+            log.msg('-------------------------------------------------', level=log.INFO)
+            log.msg('code_set', level=log.INFO)
+            log.msg(str(len(self.code_set)), level=log.INFO)
 
             jockeycode_ = tr.xpath('td[7]/a/@href').extract()[0]
             jockeycode = re.match(r"^[^\?]+\?jockeycode=(?P<code>\w+)'.*",
@@ -84,7 +95,10 @@ class RaceSpider(scrapy.Spider):
             yield request
 
     def parse_horse(self, response):
-
+        RaceSpider.count_unique_horse_request += 1
+        log.msg('RaceSpider.count_unique_horse_request', level=log.INFO)
+        log.msg(str(RaceSpider.count_unique_horse_request), level=log.INFO)
+        
         totalstakes = response.xpath('//td[preceding-sibling::td[1]/font['
             'text() = "Total Stakes*"]]/font/text()').extract()[0]
 
@@ -128,7 +142,7 @@ class RaceSpider(scrapy.Spider):
                 'text(), "--")]/text()').extract():
             tip = re.match(r'^(?P<val>[^-].+\d)[^\d]*--[^A-Z]*(?P<name>.+)\r\n',
                 tip_).groupdict()
-            tips.update({tip['name']: tip['val']})
+            tips.update({tip['name']: tip['val'].replace(u'\xa0', u'')})
 
         return items.RaceItem(
             racename=response.meta['racename'],
