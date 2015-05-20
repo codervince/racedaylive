@@ -144,6 +144,59 @@ class RaceSpider(scrapy.Spider):
                 tip_).groupdict()
             tips.update({tip['name']: tip['val'].replace(u'\xa0', u'')})
 
+        comments_url = 'http://racing.scmp.com/RaceCardPro/comment{}.asp'.format(
+            response.meta['racenumber'])
+        request = scrapy.Request(comments_url, callback=self.parse_comments)
+        request.meta.update(response.meta)
+        request.meta.update(tips=tips)
+
+        return request
+
+    def parse_comments(self, response):
+
+        comment_ = response.xpath('//td[font[contains(text(), "{}")]]/'
+            'following-sibling::td/font/text()'.format(
+            response.meta['horsename'])).extract()
+        comment = comment_ and comment_[0]
+
+        workouts_url = 'http://racing.scmp.com/Trackwork/Summary/Summary{}.asp'.format(
+            response.meta['racenumber'])
+        request = scrapy.Request(workouts_url, callback=self.parse_workouts)
+        request.meta.update(response.meta)
+        request.meta.update(comment=comment)
+
+        return request
+
+    def parse_workouts(self, response):
+
+        tr = response.xpath('//tr[td[2]//a[text() = "{}"]]'.format(
+            response.meta['horsename']))
+
+        font = tr.xpath('td[8]/font')
+
+        totaljump_ = font.xpath('font[1]/text()').extract()[0]
+        totaljump = re.match(r'^Jump:[^\d]+(?P<num>\d+)$', totaljump_
+            ).groupdict()['num']
+
+        totalcanter_ = font.xpath('text()[2]').extract()[0][3:]
+        totalcanter = re.match(r'^.*Canter: (?P<num>\d+)$', totalcanter_
+            ).groupdict()['num']
+
+        totalbarrier_ = font.xpath('font[2]/text()').extract()[0]
+        totalbarrier = re.match(r'^Barrier: (?P<num>\d+)$', totalbarrier_
+            ).groupdict()['num']
+
+        totalswim_ = font.xpath('text()[3]').extract()[0][7:]
+        totalswim = re.match(r'^.*Swim: (?P<num>\d+)$', totalswim_
+            ).groupdict()['num']
+
+        BTNumber_url = tr.xpath('td[4]//a/@href').extract()
+        BTNumber = None
+        if BTNumber_url:
+            BTNumber_re = re.match(r'../../Trackwork/barrier/2015/(?P<num>\d+).asp',
+                BTNumber_url[0])
+            BTNumber = BTNumber_re and BTNumber_re.groupdict()['num']
+
         return items.RaceItem(
             racename=response.meta['racename'],
             horsenumber=response.meta['horsenumber'],
@@ -152,5 +205,11 @@ class RaceSpider(scrapy.Spider):
             jockeycode=response.meta['jockeycode'],
             totalstakes=response.meta['totalstakes'],
             besttimes=response.meta['besttimes'],
-            tips=tips,
+            tips=response.meta['tips'],
+            comment=response.meta['comment'],
+            totaljump=totaljump,
+            totalcanter=totalcanter,
+            totalbarrier=totalbarrier,
+            totalswim=totalswim,
+            BTNumber=BTNumber,
         )
