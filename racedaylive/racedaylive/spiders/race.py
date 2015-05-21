@@ -186,9 +186,9 @@ class RaceSpider(scrapy.Spider):
         totalbarrier = re.match(r'^Barrier: (?P<num>\d+)$', totalbarrier_
             ).groupdict()['num']
 
-        totalswim_ = font.xpath('text()[3]').extract()[0][7:]
-        totalswim = re.match(r'^.*Swim: (?P<num>\d+)$', totalswim_
-            ).groupdict()['num']
+        # totalswim_ = font.xpath('text()[3]').extract()[0][7:]
+        # totalswim = re.match(r'^.*Swim: (?P<num>\d+)$', totalswim_
+        #     ).groupdict()['num']
 
         BTNumber_url = tr.xpath('td[4]//a/@href').extract()
         BTNumber = None
