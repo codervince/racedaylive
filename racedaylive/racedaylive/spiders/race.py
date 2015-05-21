@@ -94,6 +94,13 @@ class RaceSpider(scrapy.Spider):
 
             yield request
 
+        tips_url = 'http://racing.scmp.com/racecardpro/racecardpro{}.asp'
+        request = scrapy.Request(tips_url.format(response.meta['racenumber']),
+            callback=self.parse_tips)
+        request.meta.update(response.meta)
+
+        yield request
+
     def parse_horse(self, response):
         RaceSpider.count_unique_horse_request += 1
         log.msg('RaceSpider.count_unique_horse_request', level=log.INFO)
@@ -102,38 +109,14 @@ class RaceSpider(scrapy.Spider):
         totalstakes = response.xpath('//td[preceding-sibling::td[1]/font['
             'text() = "Total Stakes*"]]/font/text()').extract()[0]
 
-        best_url = 'http://racing.scmp.com/statistic_chart/bestfinish{}.asp'
-        request = scrapy.Request(best_url.format(response.meta['racenumber']),
-            callback=self.parse_best)
-        request.meta.update(response.meta)
-        request.meta.update(totalstakes=totalstakes)
-
-        yield request
-
-    def parse_best(self, response):
-
-        # log bestfinishes
-        scrapy.log.msg(response.url, level=scrapy.log.INFO)
-
-        tr_selector = '//tr[td/font/b[text()="{horsename}"]] | //tr[td/font/b'\
-            '[text()="{horsename}"]]/following-sibling::tr'.format(
-            horsename=response.meta['horsename'])
-        besttimes = []
-        for i, tr in enumerate(response.xpath(tr_selector)):
-            if i > 0 and (tr.xpath('td/font/b/text()').extract() or
-                    not tr.xpath('td[1][not(font) and not(@colspan)]').extract()):
-                break
-            besttimes_ = tr.xpath('td[3]/font/text()').extract()[0]
-            besttimes.append(re.match(r'^.*\((?P<time>.+)\)$', besttimes_
-                ).groupdict()['time'])
-
-        tips_url = 'http://racing.scmp.com/racecardpro/racecardpro{}.asp'
-        request = scrapy.Request(tips_url.format(response.meta['racenumber']),
-            callback=self.parse_tips)
-        request.meta.update(response.meta)
-        request.meta.update(besttimes=besttimes)
-
-        return request
+        yield items.HorseItem(
+            racename=response.meta['racename'],
+            horsenumber=response.meta['horsenumber'],
+            horsename=response.meta['horsename'],
+            horsecode=response.meta['horsecode'],
+            jockeycode=response.meta['jockeycode'],
+            totalstakes=totalstakes,
+        )
 
     def parse_tips(self, response):
 
@@ -146,11 +129,16 @@ class RaceSpider(scrapy.Spider):
 
         comments_url = 'http://racing.scmp.com/RaceCardPro/comment{}.asp'.format(
             response.meta['racenumber'])
-        request = scrapy.Request(comments_url, callback=self.parse_comments)
-        request.meta.update(response.meta)
-        request.meta.update(tips=tips)
 
-        return request
+        for horsename in response.xpath('//tr//tr//table[@bgcolor="#A70E13"]'
+                '//tr[@bgcolor="white"]/td[4]//a/text()').extract():
+
+            request = scrapy.Request(comments_url, callback=self.parse_comments)
+            request.meta.update(response.meta)
+            request.meta.update(tips=tips)
+            request.meta.update(horsename=horsename)
+    
+            yield request
 
     def parse_comments(self, response):
 
@@ -197,19 +185,43 @@ class RaceSpider(scrapy.Spider):
                 BTNumber_url[0])
             BTNumber = BTNumber_re and BTNumber_re.groupdict()['num']
 
+        best_url = 'http://racing.scmp.com/statistic_chart/bestfinish{}.asp'
+        request = scrapy.Request(best_url.format(response.meta['racenumber']),
+            callback=self.parse_best)
+        request.meta.update(response.meta)
+        request.meta.update(totaljump=totaljump)
+        request.meta.update(totalcanter=totalcanter)
+        request.meta.update(totalbarrier=totalbarrier)
+        request.meta.update(totalswim=totalswim)
+        request.meta.update(BTNumber=BTNumber)
+
+        yield request
+
+    def parse_best(self, response):
+
+        # log bestfinishes
+        scrapy.log.msg(response.url, level=scrapy.log.INFO)
+
+        tr_selector = '//tr[td/font/b[text()="{horsename}"]] | //tr[td/font/b'\
+            '[text()="{horsename}"]]/following-sibling::tr'.format(
+            horsename=response.meta['horsename'])
+        besttimes = []
+        for i, tr in enumerate(response.xpath(tr_selector)):
+            if i > 0 and (tr.xpath('td/font/b/text()').extract() or
+                    not tr.xpath('td[1][not(font) and not(@colspan)]').extract()):
+                break
+            besttimes_ = tr.xpath('td[3]/font/text()').extract()[0]
+            besttimes.append(re.match(r'^.*\((?P<time>.+)\)$', besttimes_
+                ).groupdict()['time'])
+
         return items.RaceItem(
-            racename=response.meta['racename'],
-            horsenumber=response.meta['horsenumber'],
-            horsename=response.meta['horsename'],
-            horsecode=response.meta['horsecode'],
-            jockeycode=response.meta['jockeycode'],
-            totalstakes=response.meta['totalstakes'],
-            besttimes=response.meta['besttimes'],
+            besttimes=besttimes,
             tips=response.meta['tips'],
             comment=response.meta['comment'],
-            totaljump=totaljump,
-            totalcanter=totalcanter,
-            totalbarrier=totalbarrier,
-            totalswim=totalswim,
-            BTNumber=BTNumber,
+            totaljump=response.meta['totaljump'],
+            totalcanter=response.meta['totalcanter'],
+            totalbarrier=response.meta['totalbarrier'],
+            totalswim=response.meta['totalswim'],
+            BTNumber=response.meta['BTNumber'],
+            horsename=response.meta['horsename'],
         )
