@@ -9,13 +9,7 @@ import scrapy
 
 
 class RaceItem(scrapy.Item):
-    racename = scrapy.Field()
-    horsenumber = scrapy.Field()
     horsename = scrapy.Field()
-    horsecode = scrapy.Field()
-    jockeycode = scrapy.Field()
-    totalstakes = scrapy.Field()
-    besttimes = scrapy.Field()
     tips = scrapy.Field()
     comment = scrapy.Field()
     totaljump = scrapy.Field()
@@ -23,3 +17,13 @@ class RaceItem(scrapy.Item):
     totalbarrier = scrapy.Field()
     totalswim = scrapy.Field()
     BTNumber = scrapy.Field()
+    besttimes = scrapy.Field()
+
+
+class HorseItem(scrapy.Item):
+    horsename = scrapy.Field()
+    racename = scrapy.Field()
+    horsenumber = scrapy.Field()
+    horsecode = scrapy.Field()
+    jockeycode = scrapy.Field()
+    totalstakes = scrapy.Field()
