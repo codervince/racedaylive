@@ -4,6 +4,9 @@ import scrapy
 from scrapy import log
 from racedaylive import items
 from datetime import datetime
+from racedaylive.utilities import *
+from dateutil.parser import parse
+import pprint
 
 class RaceSpider(scrapy.Spider):
 
@@ -19,6 +22,7 @@ class RaceSpider(scrapy.Spider):
         
         super(RaceSpider, self).__init__(*args, **kwargs)
         self.hkjc_domain = 'racing.hkjc.com'
+        self.racedate = racedate
         self.after_login_url = 'http://{domain}/racing/Info/Meeting/RaceCard'\
             '/English/Local/{racedate}/{coursecode}/1'.format(
                 domain=self.hkjc_domain,
@@ -63,6 +67,9 @@ class RaceSpider(scrapy.Spider):
         racename = re.match(r'^Race \d+.{3}(?P<name>.+)$', racename_
             ).groupdict()['name']
 
+        ### RaceCategory RACETIME SURFACE DISTANCE GOING 
+        ### PM RATING CLASS  
+
         for tr in response.xpath('(//table[@class="draggable hiddenable"]//tr)'
                 '[position() > 1]'):
 
@@ -86,6 +93,7 @@ class RaceSpider(scrapy.Spider):
             request.meta.update(response.meta)
             request.meta.update(
                 racename=racename,
+                racedate = self.racedate,
                 horsenumber=horsenumber,
                 horsename=horsename,
                 horsecode=horsecode,
@@ -109,16 +117,75 @@ class RaceSpider(scrapy.Spider):
         totalstakes = response.xpath('//td[preceding-sibling::td[1]/font['
             'text() = "Total Stakes*"]]/font/text()').extract()[0]
 
+        #DD - previousruns: Place, Date, Rating
+        prev_places = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=2]//font/text()").extract()
+        prev_dates = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=3]/text()").extract()
+        # remove  u'\r\n\t\t'
+        prev_dates = [ x for x in prev_dates if x != u'\r\n\t\t']
+                
+        prev_ratings = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=9]/text()").extract()
+
+        # pprint.pprint(prev_places)
+        # pprint.pprint(prev_dates)
+
+
+        ##DD isMdn
+        
+        invalid_dates = [i for i, x in enumerate(prev_dates) if datetime.strptime(x, '%d/%m/%y') >= datetime.strptime(response.meta['racedate'], '%Y%m%d')] #20150527
+        valid_from_index = None
+        win_indices = [i for i, x in enumerate(prev_places) if x == "01"]
+        if len(invalid_dates) >0:
+            valid_from_index = max(invalid_dates) 
+            win_indices = win_indices[valid_from_index:]
+
+        is_maiden = False
+
+        if len(win_indices) ==0:
+            is_maiden= True
+
+        min_index = None
+        last_won_at = None
+        if len(win_indices) >0: 
+            min_index = min(win_indices)
+            last_won_at = prev_ratings[min_index]
+
+
+        ##EarlyPacePoints need secs + lbw_post  
+        ##what are qualifying races?
+
+
+
+
+        ##TODO internalhorseindex - need racecourse
         yield items.HorseItem(
-            racename=response.meta['racename'],
-            horsenumber=response.meta['horsenumber'],
-            horsename=response.meta['horsename'],
+            racedate=response.meta['racedate'],
+            racename=unicode.strip(response.meta['racename']),
+            racenumber=try_int(response.meta['racenumber']),
+            horsenumber=try_int(response.meta['horsenumber']),
+            horsename=unicode.strip(response.meta['horsename']),
             horsecode=response.meta['horsecode'],
             jockeycode=response.meta['jockeycode'],
-            totalstakes=totalstakes,
+            totalstakes=cleanpm(unicode.strip(totalstakes)),
+            lastwonat = last_won_at,
+            isMaiden = is_maiden,
+            invalid_dates = prev_dates
         )
 
     def parse_tips(self, response):
+
+        
+        event_ = response.xpath("//font/b/text()[contains(.,'Race')]").extract()[0]
+        event = unicode.replace(event_, u'\xa0', u'')
+        event_d = re.match(r'^(?P<racedate>\d\d-\d\d-\d\d\d\d)\s*Race\s(?P<racenumber>\d+)\s*-\s(?P<racetime>\d+:\d\d)', unicode.strip(event)).groupdict()
+        
+        ##racetype
+        racetype = response.xpath("//font/b/text()[contains(.,'Class')] | text()[contains(., 'Group')]").extract()[0]
+        
+
+        event2 = unicode.strip(response.xpath("//font/b/text()[contains(.,'Sha Tin')] | text()[contains(., 'Happy Valley')]").extract()[0])
+        event2_d = re.match(r'^(?P<racecourse>(Sha Tin|Happy Valley))[^A-Z]*', event2).groupdict()
+        ##racecourse##distance##surface
+
 
         tips = {}
         for tip_ in response.xpath('//table//font/select/option[contains('
@@ -137,7 +204,11 @@ class RaceSpider(scrapy.Spider):
             request.meta.update(response.meta)
             request.meta.update(tips=tips)
             request.meta.update(horsename=horsename)
-    
+            request.meta.update(racecourse=event2_d['racecourse'])
+            request.meta.update(racetype=racetype)
+            request.meta.update(racedate=parse(event_d['racedate']))
+            # request.meta.update(racenumber=event_d['racenumber'])
+            request.meta.update(localracetime=event_d['racetime'])
             yield request
 
     def parse_comments(self, response):
@@ -174,9 +245,10 @@ class RaceSpider(scrapy.Spider):
         totalbarrier = re.match(r'^Barrier: (?P<num>\d+)$', totalbarrier_
             ).groupdict()['num']
 
-        # totalswim_ = font.xpath('text()[3]').extract()[0][7:]
-        # totalswim = re.match(r'^.*Swim: (?P<num>\d+)$', totalswim_
-        #     ).groupdict()['num']
+        totalswim_ = font.xpath('text()[3]').extract()[0][7:]
+        totalswim_match = re.match(r'^.*Swim: (?P<num>\d+)$', totalswim_
+            )
+        totalswim = totalswim_match and totalswim_match.groupdict()['num']
 
         BTNumber_url = tr.xpath('td[4]//a/@href').extract()
         BTNumber = None
@@ -198,7 +270,6 @@ class RaceSpider(scrapy.Spider):
         yield request
 
     def parse_best(self, response):
-
         # log bestfinishes
         scrapy.log.msg(response.url, level=scrapy.log.INFO)
 
@@ -214,14 +285,22 @@ class RaceSpider(scrapy.Spider):
             besttimes.append(re.match(r'^.*\((?P<time>.+)\)$', besttimes_
                 ).groupdict()['time'])
 
+        ##TOD raceindex
         return items.RaceItem(
-            besttimes=besttimes,
+            standard_deviation = getbestfinishstats(besttimes)['standard-deviation'],
+            avgdistance= getbestfinishstats(besttimes)['avg'],
+            racedate = response.meta['racedate'],
+            racecoursecode = getrc(response.meta['racecourse']),
+            racetype = response.meta['racetype'], 
+            racenumber = try_int(response.meta['racenumber']),
+            internalraceindex = getinternalraceindex(response.meta['racedate'], getrc(response.meta['racecourse']), try_int(response.meta['racenumber'])),
+            utcracetime = local2utc(response.meta['racedate'],response.meta['localracetime']),
             tips=response.meta['tips'],
-            comment=response.meta['comment'],
-            totaljump=response.meta['totaljump'],
-            totalcanter=response.meta['totalcanter'],
-            totalbarrier=response.meta['totalbarrier'],
-            totalswim=response.meta['totalswim'],
-            BTNumber=response.meta['BTNumber'],
+            comment=cleanstring(response.meta['comment']),
+            totaljump=try_int(response.meta['totaljump']),
+            totalcanter=try_int(response.meta['totalcanter']),
+            totalbarrier=try_int(response.meta['totalbarrier']),
+            totalswim=try_int(response.meta['totalswim']),
+            BTNumber=try_int(response.meta['BTNumber']),
             horsename=response.meta['horsename'],
         )
