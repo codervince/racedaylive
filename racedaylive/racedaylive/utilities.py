@@ -39,6 +39,24 @@ def cleanstring(s):
     pattern = re.compile(r'\s+')
     return re.sub(pattern, u' ',s).sub(u'-', u'')
 
+## for comparing with historical data
+## ST / "AWT" / "-"
+def getrc_track_course(racecourse, surface):
+    rc_code = getrc(racecourse)
+    surface = unicode.strip(surface)
+    surface_course_codes = {
+    u'"A" Course': ("Turf", "A"),
+    u'"A+3" Course': ("Turf", "A+3"),   
+    u'"B" Course': ("Turf", "B"),
+    u'"B+2" Course': ("Turf", "B+2"),
+    u'"C" Course': ("Turf", "C"), 
+    u'"C+3" Course': ("Turf", "C+3"),
+    u'All Weather Track': ("AWT", "-")
+    }
+    spacer = u' / '
+    newsurface, newcourse = surface_course_codes[surface]
+    return rc_code+spacer+newsurface+spacer+newcourse
+    # add u' / '
 
 def getinternalraceindex(racedate, racecoursecode, racenumber):
     if type(racedate) != type(datetime(2015, 5, 31, 0, 0)):
@@ -51,12 +69,15 @@ def average(s): return sum(s) * 1.0 / len(s)
 
 def getbestfinishstats(besttimes):
     #make sure best finishes is a list
+    ##init dictionary keys
+    stats = {}
+    stats['standard-deviation'] = None
+    stats['variance'] = None
+    stats['avg'] = None
     if type(besttimes) != type([]):
         return None
     if len(besttimes) == 0:
         return None
-    stats = {}
-    stats['standard-deviation'] = None
     thesum = reduce(operator.add, map(float,besttimes))
     stats['avg'] = round(thesum*1.0/len(besttimes),2)
     # stats['maxdistance'] = max(map(float, besttimes))
