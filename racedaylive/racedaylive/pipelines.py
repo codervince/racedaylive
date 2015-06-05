@@ -10,3 +10,6 @@ class RacedaylivePipeline(object):
     def process_item(self, item, spider):
 		pp.pprint(RaceSpider.code_set)        
         return item
+
+
+## COMMENT SEPARATE TABLE
