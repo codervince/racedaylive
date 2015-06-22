@@ -319,3 +319,6 @@ remove \r\n\t\t\t\t\t
 '''
 def cleanstring(value):
     return unicode.strip(value)
+
+def getdateobject(datestring):
+    return datetime.strptime(datestring, '%Y%m%d').date()

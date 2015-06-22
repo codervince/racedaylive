@@ -218,7 +218,7 @@ class RaceSpider(scrapy.Spider):
         ##TODO internalhorseindex - need racecourse
         yield items.HorseItem(
             racedate=response.meta['racedate'],
-            utcracetime = local2utc(response.meta['racedate'],response.meta['localtime']),
+            utcracetime = local2utc(getdateobject(response.meta['racedate']),response.meta['localtime']),
             racecourse=response.meta['racecourse'],
             raceclass=response.meta['raceclass'],
             racesurface=response.meta['racesurface'],
