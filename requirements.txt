@@ -5,3 +5,4 @@ lxml==3.4.2
 cssselect==0.9.1
 pyOpenSSL==0.14
 service_identity
+python-dateutil
