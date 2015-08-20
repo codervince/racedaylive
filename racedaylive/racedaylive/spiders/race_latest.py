@@ -188,12 +188,13 @@ class RaceSpider(scrapy.Spider):
         for line_selector, time_selector in zip(horse_lines_selector, 
                 sectional_time_selector):
 
-            horsenumber = line_selector.xpath('td[1]/div/text()').extract()[0].strip()
+            placing = line_selector.xpath('td[1]/div/text()').extract()[0].strip()
+
+            horsenumber = line_selector.xpath('td[2]/div/text()').extract()[0].strip()
 
             horse_name_cell = line_selector.xpath('td[3]/div/a/text()').extract()[0]
             horse_name_regexp = '^(?P<name>[^\(]+)\((?P<code>[^\)]+)\)$'
             horse_name_dict = re.match(horse_name_regexp, horse_name_cell).groupdict()
-            horsename = horse_name_dict['name']
             horsecode = horse_name_dict['code']
 
             timelist = [time.strip() for time in time_selector.xpath('td/text()').extract()]
@@ -208,15 +209,25 @@ class RaceSpider(scrapy.Spider):
                 'td//table//td/text()').extract()]
             marginsbehindleader.extend([None]*(6 - len(marginsbehindleader)))
 
+            finish_time = line_selector.xpath('td[10]/div/text()').extract()[0]
+
+            positions = [s.strip('\t\n\r ') for s in line_selector.xpath(
+                'td//table//td[1]/div/div/text()').extract()]
+            positions.extend([None]*(6 - len(positions)))
+
             meta_dict = response.meta
             meta_dict.update({
                 'horsenumber': horsenumber,
-                'horsename': horsename,
                 'horsecode': horsecode,
+                'placing': placing,
+                'finish_time': finish_time,
+                'positions': positions,
                 'timelist': timelist,
                 'horse_url': horse_url,
                 'marginsbehindleader': marginsbehindleader,
             })
+            print '+++++++++++++++++++++++++++++++++++++++++'
+            print meta_dict
 
     def parse_horse(self, response):
         RaceSpider.count_unique_horse_request += 1
