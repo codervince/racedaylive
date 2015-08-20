@@ -22,6 +22,7 @@ class RaceSpider(scrapy.Spider):
         
         super(RaceSpider, self).__init__(*args, **kwargs)
         self.hkjc_domain = 'racing.hkjc.com'
+        self.domain = 'hkjc.com'
         self.racedate = racedate
         self.racecoursecode = coursecode
         self.after_login_url = 'http://{domain}/racing/Info/Meeting/RaceCard'\
@@ -162,7 +163,8 @@ class RaceSpider(scrapy.Spider):
         yield request
 
         
-        result_path = response.xpath('//ul[@id="navmenu-h"]//a[text()="Results"]/@href')
+        result_path = response.xpath('//ul[@id="navmenu-h"]//'
+            'a[text()="Results"]/@href').extract()[0]
         result_url = 'http://{domain}/{path}'.format(
             domain=self.hkjc_domain, path=result_path)
         request = scrapy.Request(result_url, callback=self.parse_results)
@@ -206,8 +208,6 @@ class RaceSpider(scrapy.Spider):
                 'td//table//td/text()').extract()]
             marginsbehindleader.extend([None]*(6 - len(marginsbehindleader)))
 
-            request = scrapy.Request(response.meta['results_url'],
-                callback=self.parse_results)
             meta_dict = response.meta
             meta_dict.update({
                 'horsenumber': horsenumber,
@@ -217,7 +217,6 @@ class RaceSpider(scrapy.Spider):
                 'horse_url': horse_url,
                 'marginsbehindleader': marginsbehindleader,
             })
-            request.meta.update(meta_dict)
 
     def parse_horse(self, response):
         RaceSpider.count_unique_horse_request += 1
@@ -231,7 +230,7 @@ class RaceSpider(scrapy.Spider):
 
         #DD - previousruns: Place, Date, Rating
         prev_places = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=2]//font/text()").extract()
-        prev_dates = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=3]/text()").extract()
+        prev_dates = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=3]//font/text()").extract()
         # remove  u'\r\n\t\t'
         prev_dates = [ x for x in prev_dates if x != u'\r\n\t\t']
 
@@ -246,7 +245,7 @@ class RaceSpider(scrapy.Spider):
         # pprint.pprint(todaysrc_track_course) 
         ##DD isMdn
         
-        invalid_dates = [i for i, x in enumerate(prev_dates) if datetime.strptime(x, '%d/%m/%y') >= datetime.strptime(response.meta['racedate'], '%Y%m%d')] #20150527
+        invalid_dates = [i for i, x in enumerate(prev_dates) if datetime.strptime(x, '%d/%m/%Y') >= datetime.strptime(response.meta['racedate'], '%Y%m%d')] #20150527
         valid_from_index = None
         win_indices = [i for i, x in enumerate(prev_places) if x == "01"]
         if len(invalid_dates) >0:
