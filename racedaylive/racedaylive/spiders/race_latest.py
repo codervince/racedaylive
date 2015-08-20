@@ -153,15 +153,71 @@ class RaceSpider(scrapy.Spider):
                 owner=owner_,
                 gear=gear_
             )
-
             yield request
 
         tips_url = 'http://racing.scmp.com/racecardpro/racecardpro{}.asp'
         request = scrapy.Request(tips_url.format(response.meta['racenumber']),
             callback=self.parse_tips)
         request.meta.update(response.meta)
-
         yield request
+
+        
+        result_path = response.xpath('//ul[@id="navmenu-h"]//a[text()="Results"]/@href')
+        result_url = 'http://{domain}/{path}'.format(
+            domain=self.hkjc_domain, path=result_path)
+        request = scrapy.Request(result_url, callback=self.parse_results)
+        request.meta.update(response.meta)
+        yield request
+
+    def parse_results(self, response):
+        sectional_time_url = response.xpath('//div[@class="rowDiv15"]/div['
+            '@class="rowDivRight"]/a/@href').extract()[0]
+        request = scrapy.Request(sectional_time_url, callback=
+            self.parse_sectional_time)
+        request.meta.update(response.meta)
+        yield request
+
+    def parse_sectional_time(self, response):
+
+        horse_lines_selector = response.xpath('//table[@class="bigborder"]//'
+            'table//a/../../..')
+        sectional_time_selector = response.xpath('//table[@class='
+            '"bigborder"]//table//a/../../../following-sibling::tr[1]')
+        for line_selector, time_selector in zip(horse_lines_selector, 
+                sectional_time_selector):
+
+            horsenumber = line_selector.xpath('td[1]/div/text()').extract()[0].strip()
+
+            horse_name_cell = line_selector.xpath('td[3]/div/a/text()').extract()[0]
+            horse_name_regexp = '^(?P<name>[^\(]+)\((?P<code>[^\)]+)\)$'
+            horse_name_dict = re.match(horse_name_regexp, horse_name_cell).groupdict()
+            horsename = horse_name_dict['name']
+            horsecode = horse_name_dict['code']
+
+            timelist = [time.strip() for time in time_selector.xpath('td/text()').extract()]
+            timelist_len = len(timelist)
+            timelist.extend([None for i in xrange(6-timelist_len)])
+
+            horse_path = line_selector.xpath('td[3]/div/a/@href').extract()[0]
+            horse_url = 'http://www.{domain}/english/racing/{path}&Option=1#htop'.format(
+                domain=self.domain, path=horse_path)
+
+            marginsbehindleader = [s.strip('\t\n\r ') for s in line_selector.xpath(
+                'td//table//td/text()').extract()]
+            marginsbehindleader.extend([None]*(6 - len(marginsbehindleader)))
+
+            request = scrapy.Request(response.meta['results_url'],
+                callback=self.parse_results)
+            meta_dict = response.meta
+            meta_dict.update({
+                'horsenumber': horsenumber,
+                'horsename': horsename,
+                'horsecode': horsecode,
+                'timelist': timelist,
+                'horse_url': horse_url,
+                'marginsbehindleader': marginsbehindleader,
+            })
+            request.meta.update(meta_dict)
 
     def parse_horse(self, response):
         RaceSpider.count_unique_horse_request += 1
@@ -285,7 +341,7 @@ class RaceSpider(scrapy.Spider):
         comment_ = response.xpath('//td[font[contains(text(), "{}")]]/'
             'following-sibling::td/font/text()'.format(
             response.meta['horsename'])).extract()
-        comment = comment_ and comment_[0]
+        comment = comment_ and comment_[0] or u''
         ### make sure racenumber is 0 padded
         workouts_url = 'http://racing.scmp.com/Trackwork/Summary/Summary{}.asp'.format(
             response.meta['racenumber'])
