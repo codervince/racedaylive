@@ -49,19 +49,92 @@ class RaceSpider(scrapy.Spider):
         #HKJC racecard
         race_paths = response.xpath('//td[@nowrap="nowrap" and @width="24px"]'
             '/a/@href').extract()
-        urls = ['http://{domain}{path}'.format(
+        card_urls = ['http://{domain}{path}'.format(
                 domain=self.hkjc_domain,
                 path=path,
             ) for path in race_paths
         ] + [response.url]
-        for url in urls:
-            if int(url.split('/')[-1]) > 9:
-                racenumber = '{}'.format(url.split('/')[-1])
+        result_urls = [_url.replace('RaceCard', 'Results') for _url in card_urls]
+        for card_url, result_url in zip(card_urls, result_urls):
+            if int(card_url.split('/')[-1]) > 9:
+                racenumber = '{}'.format(card_url.split('/')[-1])
             else:
-                racenumber = '0{}'.format(url.split('/')[-1])
-            request = scrapy.Request(url, callback=self.parse_race)
+                racenumber = '0{}'.format(card_url.split('/')[-1])
+            request = scrapy.Request(result_url, callback=self.parse_results)
             request.meta['racenumber'] = racenumber
+            request.meta['card_url'] = card_url
             yield request
+
+    def parse_results(self, response):
+        sectional_time_url = response.xpath('//div[@class="rowDiv15"]/div['
+            '@class="rowDivRight"]/a/@href').extract()
+        try:
+            sectional_time_url = sectional_time_url[0]
+        except IndexError:
+            print '++++++++++++++++++++++++++body+++++++++++++++++++++++++'
+            print response.body
+            assert False
+        request = scrapy.Request(sectional_time_url, callback=
+            self.parse_sectional_time)
+        request.meta.update(response.meta)
+        yield request
+
+    def parse_sectional_time(self, response):
+
+        horse_lines_selector = response.xpath('//table[@class="bigborder"]//'
+            'table//a/../../..')
+        sectional_time_selector = response.xpath('//table[@class='
+            '"bigborder"]//table//a/../../../following-sibling::tr[1]')
+        sectional_time_data = {}
+        for line_selector, time_selector in zip(horse_lines_selector, 
+                sectional_time_selector):
+
+            placing = line_selector.xpath('td[1]/div/text()').extract()[0].strip()
+
+            horsenumber = line_selector.xpath('td[2]/div/text()').extract()[0].strip()
+
+            horse_name_cell = line_selector.xpath('td[3]/div/a/text()').extract()[0]
+            horse_name_regexp = '^(?P<name>[^\(]+)\((?P<code>[^\)]+)\)$'
+            horse_name_dict = re.match(horse_name_regexp, horse_name_cell).groupdict()
+            horsecode = horse_name_dict['code']
+
+            timelist = [time.strip() for time in time_selector.xpath('td/text()').extract()]
+            timelist_len = len(timelist)
+            timelist.extend([None for i in xrange(6-timelist_len)])
+
+            horse_path = line_selector.xpath('td[3]/div/a/@href').extract()[0]
+            horse_url = 'http://www.{domain}/english/racing/{path}&Option=1#htop'.format(
+                domain=self.domain, path=horse_path)
+
+            marginsbehindleader = [s.strip('\t\n\r ') for s in line_selector.xpath(
+                'td//table//td/text()').extract()]
+            marginsbehindleader.extend([None]*(6 - len(marginsbehindleader)))
+
+            finish_time = line_selector.xpath('td[10]/div/text()').extract()[0]
+
+            positions = [s.strip('\t\n\r ') for s in line_selector.xpath(
+                'td//table//td[1]/div/div/text()').extract()]
+            positions.extend([None]*(6 - len(positions)))
+
+            sectional_time_data.update({(horsecode, response.meta['racenumber']):
+                {
+                    'horsecode': horsecode,
+                    'horsenumber': horsenumber,
+                    'placing': placing,
+                    'finish_time': finish_time,
+                    'marginsbehindleader': marginsbehindleader,
+                    'positions': positions,
+                    'timelist': timelist,
+                    'horse_url': horse_url,
+                }
+            })
+        print '+++++++++++++++++++++++++++++++++++++++++'
+        print sectional_time_data
+
+        request = scrapy.Request(response.meta['card_url'], callback=self.parse_race)
+        request.meta.update(response.meta)
+        request.meta['sectional_time_data'] = sectional_time_data
+        yield request
 
     def parse_race(self, response):
 
@@ -135,6 +208,7 @@ class RaceSpider(scrapy.Spider):
 
             request = scrapy.Request('http://www.hkjc.com/english/racing/horse.'
                 'asp?horseno={}'.format(horsecode), callback=self.parse_horse)
+            sec_time_data = response.meta['sectional_time_data'][(horsecode, response.meta['racenumber'])]
             request.meta.update(response.meta)
             request.meta.update(
                 localtime=localtime,
@@ -152,7 +226,12 @@ class RaceSpider(scrapy.Spider):
                 trainercode=trainercode,
                 todaysrating=todaysrating_,
                 owner=owner_,
-                gear=gear_
+                gear=gear_,
+                placing=sec_time_data['placing'],
+                finish_time=sec_time_data['finish_time'],
+                marginsbehindleader=sec_time_data['marginsbehindleader'],
+                positions=sec_time_data['positions'],
+                timelist=sec_time_data['timelist'],
             )
             yield request
 
@@ -161,73 +240,6 @@ class RaceSpider(scrapy.Spider):
             callback=self.parse_tips)
         request.meta.update(response.meta)
         yield request
-
-        
-        result_path = response.xpath('//ul[@id="navmenu-h"]//'
-            'a[text()="Results"]/@href').extract()[0]
-        result_url = 'http://{domain}/{path}'.format(
-            domain=self.hkjc_domain, path=result_path)
-        request = scrapy.Request(result_url, callback=self.parse_results)
-        request.meta.update(response.meta)
-        yield request
-
-    def parse_results(self, response):
-        sectional_time_url = response.xpath('//div[@class="rowDiv15"]/div['
-            '@class="rowDivRight"]/a/@href').extract()[0]
-        request = scrapy.Request(sectional_time_url, callback=
-            self.parse_sectional_time)
-        request.meta.update(response.meta)
-        yield request
-
-    def parse_sectional_time(self, response):
-
-        horse_lines_selector = response.xpath('//table[@class="bigborder"]//'
-            'table//a/../../..')
-        sectional_time_selector = response.xpath('//table[@class='
-            '"bigborder"]//table//a/../../../following-sibling::tr[1]')
-        for line_selector, time_selector in zip(horse_lines_selector, 
-                sectional_time_selector):
-
-            placing = line_selector.xpath('td[1]/div/text()').extract()[0].strip()
-
-            horsenumber = line_selector.xpath('td[2]/div/text()').extract()[0].strip()
-
-            horse_name_cell = line_selector.xpath('td[3]/div/a/text()').extract()[0]
-            horse_name_regexp = '^(?P<name>[^\(]+)\((?P<code>[^\)]+)\)$'
-            horse_name_dict = re.match(horse_name_regexp, horse_name_cell).groupdict()
-            horsecode = horse_name_dict['code']
-
-            timelist = [time.strip() for time in time_selector.xpath('td/text()').extract()]
-            timelist_len = len(timelist)
-            timelist.extend([None for i in xrange(6-timelist_len)])
-
-            horse_path = line_selector.xpath('td[3]/div/a/@href').extract()[0]
-            horse_url = 'http://www.{domain}/english/racing/{path}&Option=1#htop'.format(
-                domain=self.domain, path=horse_path)
-
-            marginsbehindleader = [s.strip('\t\n\r ') for s in line_selector.xpath(
-                'td//table//td/text()').extract()]
-            marginsbehindleader.extend([None]*(6 - len(marginsbehindleader)))
-
-            finish_time = line_selector.xpath('td[10]/div/text()').extract()[0]
-
-            positions = [s.strip('\t\n\r ') for s in line_selector.xpath(
-                'td//table//td[1]/div/div/text()').extract()]
-            positions.extend([None]*(6 - len(positions)))
-
-            meta_dict = response.meta
-            meta_dict.update({
-                'horsenumber': horsenumber,
-                'horsecode': horsecode,
-                'placing': placing,
-                'finish_time': finish_time,
-                'positions': positions,
-                'timelist': timelist,
-                'horse_url': horse_url,
-                'marginsbehindleader': marginsbehindleader,
-            })
-            print '+++++++++++++++++++++++++++++++++++++++++'
-            print meta_dict
 
     def parse_horse(self, response):
         RaceSpider.count_unique_horse_request += 1
@@ -301,7 +313,12 @@ class RaceSpider(scrapy.Spider):
             todaysrating=response.meta['todaysrating'],
             gear=response.meta['gear'],
             lastwonat = last_won_at,
-            isMaiden = is_maiden
+            isMaiden = is_maiden,
+            placing=response.meta['placing'],
+            finish_time=response.meta['finish_time'],
+            marginsbehindleader=response.meta['marginsbehindleader'],
+            positions=response.meta['positions'],
+            timelist=response.meta['timelist'],
         )
 
     def parse_tips(self, response):

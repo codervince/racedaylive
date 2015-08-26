@@ -54,3 +54,8 @@ class HorseItem(scrapy.Item):
     invalid_dates = scrapy.Field()
     owner = scrapy.Field()
     gear = scrapy.Field()
+    placing = scrapy.Field()
+    finish_time = scrapy.Field()
+    marginsbehindleader = scrapy.Field()
+    positions = scrapy.Field()
+    timelist = scrapy.Field()
