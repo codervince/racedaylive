@@ -68,14 +68,18 @@ class RaceSpider(scrapy.Spider):
     def parse_results(self, response):
         sectional_time_url = response.xpath('//div[@class="rowDiv15"]/div['
             '@class="rowDivRight"]/a/@href').extract()
+        print sectional_time_url[0]
         try:
-            sectional_time_url = sectional_time_url[0]
+            _sectional_time_url = sectional_time_url[0]
         except IndexError:
             print '++++++++++++++++++++++++++body+++++++++++++++++++++++++'
             print response.body
             assert False
-        request = scrapy.Request(sectional_time_url, callback=
+        request = scrapy.Request(_sectional_time_url, callback=
             self.parse_sectional_time)
+        #self.parse_race
+        # request = scrapy.Request(response.meta['card_url'], callback=
+            # self.parse_race)
         request.meta.update(response.meta)
         yield request
 
@@ -158,8 +162,19 @@ class RaceSpider(scrapy.Spider):
         distance = None
         surface = None
         if surface_distance:
-            surface = unicode.strip(unicode.split(surface_distance, u',')[-2])
-            distance = unicode.strip(unicode.split(surface_distance, u',')[0].replace('M',''))
+            print "surface distance\n", 
+            print surface_distance
+
+            # racedistance': u'Turf',  'racesurface': u'1800M',
+            ## this line has: Turf, "B+2" Course, 1800M, Good To Firm
+            #other lines have Turf, "C" Course, 1000M, Good To Firm
+            # Turf, "C" Course, 1800M, Good
+            # All Weather Track, 1200M, Fast len 3 
+
+            surface = unicode.strip(unicode.split(surface_distance, u',')[0])
+            distance = unicode.strip(unicode.split(surface_distance, u',')[1].replace('M',''))
+            #only if not current race!!
+            going = unicode.strip(unicode.split(surface_distance, u',')[2])
 
         racerating = None
         raceclass = None
@@ -178,7 +193,7 @@ class RaceSpider(scrapy.Spider):
 
         ### RaceCategory RACETIME SURFACE DISTANCE GOING 
         ### PM RATING CLASS  
-
+        ##season_stakes and priority
         for tr in response.xpath('(//table[@class="draggable hiddenable"]//tr)'
                 '[position() > 1]'):
 
@@ -206,6 +221,11 @@ class RaceSpider(scrapy.Spider):
             owner_ = tr.xpath('td[22]/text()').extract()[0]
             gear_ = tr.xpath('td[21]/text()').extract()[0]
 
+            seasonstakes_ = tr.xpath('td[18]/text()').extract()[0]
+            priority_ = tr.xpath('td[20]/text()').extract()[0]
+            draw_ = tr.xpath('td[8]/text()').extract()[0]
+
+
             request = scrapy.Request('http://www.hkjc.com/english/racing/horse.'
                 'asp?horseno={}'.format(horsecode), callback=self.parse_horse)
             sec_time_data = response.meta['sectional_time_data'][(horsecode, response.meta['racenumber'])]
@@ -215,6 +235,7 @@ class RaceSpider(scrapy.Spider):
                 racename=racename,
                 racecourse=racecourse,
                 racesurface=surface,
+                racegoing= going,
                 racedistance=distance,
                 raceclass=raceclass,
                 racerating= racerating,
@@ -227,11 +248,14 @@ class RaceSpider(scrapy.Spider):
                 todaysrating=todaysrating_,
                 owner=owner_,
                 gear=gear_,
+                draw=draw_,
                 placing=sec_time_data['placing'],
-                finish_time=sec_time_data['finish_time'],
+                finish_time=get_sec(sec_time_data['finish_time']),
                 marginsbehindleader=sec_time_data['marginsbehindleader'],
                 positions=sec_time_data['positions'],
                 timelist=sec_time_data['timelist'],
+                seasonstakes = seasonstakes_,
+                priority = priority_
             )
             yield request
 
@@ -241,13 +265,13 @@ class RaceSpider(scrapy.Spider):
         request.meta.update(response.meta)
         yield request
 
+    ##RESULTS IS TAKING CARE OF THIS STUFF OK
     def parse_horse(self, response):
         RaceSpider.count_unique_horse_request += 1
         log.msg('RaceSpider.count_unique_horse_request', level=log.INFO)
         log.msg(str(RaceSpider.count_unique_horse_request), level=log.INFO)
         
-        #TODAY'S going? CD 
-
+        ## GET SEASON STAKES INSTEAD
         totalstakes = response.xpath('//td[preceding-sibling::td[1]/font['
             'text() = "Total Stakes*"]]/font/text()').extract()[0]
 
@@ -299,6 +323,8 @@ class RaceSpider(scrapy.Spider):
             utcracetime = local2utc(getdateobject(response.meta['racedate']),response.meta['localtime']),
             racecourse=response.meta['racecourse'],
             raceclass=response.meta['raceclass'],
+            racedistance=response.meta['racedistance'],
+            racegoing=response.meta['racegoing'],
             racesurface=response.meta['racesurface'],
             racerating=response.meta['racerating'],
             racename=unicode.strip(response.meta['racename']),
@@ -319,6 +345,8 @@ class RaceSpider(scrapy.Spider):
             marginsbehindleader=response.meta['marginsbehindleader'],
             positions=response.meta['positions'],
             timelist=response.meta['timelist'],
+            priority=response.meta['priority'],
+            seasonstakes=response.meta['seasonstakes']
         )
 
     def parse_tips(self, response):
@@ -439,7 +467,7 @@ class RaceSpider(scrapy.Spider):
                 ).groupdict()['time'])
 
         ##TOD raceindex
-
+        ### ONLY CALL IF self.racedate NOT IN PAST 
         return items.RaceItem(
             # standard_deviation = getbestfinishstats(besttimes)['standard-deviation'],
             # avgdistance= getbestfinishstats(besttimes)['avg'],

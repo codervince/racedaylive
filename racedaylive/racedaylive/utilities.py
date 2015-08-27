@@ -35,6 +35,15 @@ import math
 
 ### RAILTYPE INFO
 
+def get_sec(s):
+    if isinstance(s, list):
+        s = s[0]
+    if s == '--':
+        return None
+    l = s.split('.') #array min, secs, milli - we want seconds
+    # l[0]*60 + l[1] + l[2]/60.0
+    return float(l[0])*60 + float(l[1]) + (float(l[2])*0.01)
+
 def cleanstring(s):
     pattern = re.compile(r'\s+')
     return re.sub(pattern, u' ',s).sub(u'-', u'')

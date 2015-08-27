@@ -11,7 +11,6 @@ import scrapy
 class RaceItem(scrapy.Item):
     racedate = scrapy.Field()
     racenumber = scrapy.Field()
-
     racetype = scrapy.Field()
     racecourse =scrapy.Field()
     racecoursecode =scrapy.Field()
@@ -40,6 +39,7 @@ class HorseItem(scrapy.Item):
     racecourse = scrapy.Field()
     raceclass = scrapy.Field()
     racerating = scrapy.Field()
+    racegoing = scrapy.Field()
     racesurface = scrapy.Field()
     racedistance=scrapy.Field()
     racenumber = scrapy.Field()
@@ -59,3 +59,5 @@ class HorseItem(scrapy.Item):
     marginsbehindleader = scrapy.Field()
     positions = scrapy.Field()
     timelist = scrapy.Field()
+    priority = scrapy.Field()
+    seasonstakes = scrapy.Field()

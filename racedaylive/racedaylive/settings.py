@@ -25,3 +25,5 @@ NEWSPIDER_MODULE = 'racedaylive.spiders'
 DUPEFILTER_CLASS = 'racedaylive.utils.DoNotFilter'
 LOG_FILE = "scrapy_%s_%s.log" % ('racedaylive', datetime.now().date())
 # LOG_FILE = 'C:/Users/Simon/RACING/SCRAPY/racedaylive/racedaylive/log.txt'
+
+AUTOTHROTTLE_ENABLED = True
