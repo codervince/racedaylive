@@ -3,7 +3,7 @@ import re
 import scrapy
 from scrapy import log
 from racedaylive import items
-from datetime import datetime
+from datetime import datetime, date
 from racedaylive.utilities import *
 from dateutil.parser import parse
 import pprint
@@ -25,12 +25,13 @@ class RaceSpider(scrapy.Spider):
         self.domain = 'hkjc.com'
         self.racedate = racedate
         self.racecoursecode = coursecode
-        self.after_login_url = 'http://{domain}/racing/Info/Meeting/RaceCard'\
+        self.races_url = 'http://{domain}/racing/Info/Meeting/RaceCard'\
             '/English/Local/{racedate}/{coursecode}/1'.format(
                 domain=self.hkjc_domain,
                 racedate=racedate, 
                 coursecode=coursecode,
         )
+        self.after_login_url = 'http://racing.scmp.com/racecardpro/racecardpro.asp'
         self.start_urls = [
             'http://racing.scmp.com/login.asp'
         ]
@@ -43,7 +44,20 @@ class RaceSpider(scrapy.Spider):
         )
 
     def after_login(self, response):
-        return scrapy.Request(self.after_login_url, callback=self.parse_races)
+        return scrapy.Request(self.after_login_url, callback=self.parse_scmp_date)
+
+    def parse_scmp_date(self, response):
+
+        date_str = response.xpath('//b[contains(text(), "Race 1")]/text()').extract()[0]
+        date_dict = re.match(r'^(?P<day>\d\d)-(?P<month>\d\d)-(?P<year>\d\d\d\d).*',
+            date_str).groupdict()
+        latest_race_date = datetime(int(date_dict['year']), int(date_dict['month']), 
+            int(date_dict['day']))
+
+        request = scrapy.Request(self.races_url, callback=self.parse_races)
+        request.meta.update(response.meta)
+        request.meta['latest_race_date'] = latest_race_date
+        return request
 
     def parse_races(self, response):
         #HKJC racecard
@@ -61,6 +75,7 @@ class RaceSpider(scrapy.Spider):
             else:
                 racenumber = '0{}'.format(card_url.split('/')[-1])
             request = scrapy.Request(result_url, callback=self.parse_results)
+            request.meta.update(response.meta)
             request.meta['racenumber'] = racenumber
             request.meta['card_url'] = card_url
             yield request
@@ -72,8 +87,6 @@ class RaceSpider(scrapy.Spider):
         try:
             _sectional_time_url = sectional_time_url[0]
         except IndexError:
-            print '++++++++++++++++++++++++++body+++++++++++++++++++++++++'
-            print response.body
             assert False
         request = scrapy.Request(_sectional_time_url, callback=
             self.parse_sectional_time)
@@ -132,8 +145,6 @@ class RaceSpider(scrapy.Spider):
                     'horse_url': horse_url,
                 }
             })
-        print '+++++++++++++++++++++++++++++++++++++++++'
-        print sectional_time_data
 
         request = scrapy.Request(response.meta['card_url'], callback=self.parse_race)
         request.meta.update(response.meta)
@@ -259,11 +270,13 @@ class RaceSpider(scrapy.Spider):
             )
             yield request
 
-        tips_url = 'http://racing.scmp.com/racecardpro/racecardpro{}.asp'
-        request = scrapy.Request(tips_url.format(response.meta['racenumber']),
-            callback=self.parse_tips)
-        request.meta.update(response.meta)
-        yield request
+        if response.meta['latest_race_date'] <= datetime.strptime(self.racedate, 
+                '%Y%m%d'):
+            tips_url = 'http://racing.scmp.com/racecardpro/racecardpro{}.asp'
+            request = scrapy.Request(tips_url.format(response.meta['racenumber']),
+                callback=self.parse_tips)
+            request.meta.update(response.meta)
+            yield request
 
     ##RESULTS IS TAKING CARE OF THIS STUFF OK
     def parse_horse(self, response):
