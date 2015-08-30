@@ -6,53 +6,35 @@
 # http://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
-
-
-class RaceItem(scrapy.Item):
-    racedate = scrapy.Field()
-    racenumber = scrapy.Field()
-    racetype = scrapy.Field()
-    racecourse =scrapy.Field()
-    racecoursecode =scrapy.Field()
-    racedistance =scrapy.Field()
-    racesurface = scrapy.Field()
-    horsename = scrapy.Field()
-    tips = scrapy.Field()
-    comment = scrapy.Field()
-    totaljump = scrapy.Field()
-    totalcanter = scrapy.Field()
-    totalbarrier = scrapy.Field()
-    totalswim = scrapy.Field()
-    BTNumber = scrapy.Field()
-    besttimes = scrapy.Field()
-    standard_deviation = scrapy.Field()
-    avgdistance = scrapy.Field()
-    internalraceindex = scrapy.Field()
-
-
+#FIRST
 class HorseItem(scrapy.Item):
-    horsename = scrapy.Field()
-    racename = scrapy.Field()
-    localracetime = scrapy.Field()
-    utcracetime = scrapy.Field()
-    racedate = scrapy.Field()
-    racecourse = scrapy.Field()
+    ### to rd_race
+    racedate = scrapy.Field() 
+    racecoursecode = scrapy.Field()
     raceclass = scrapy.Field()
     racerating = scrapy.Field()
     racegoing = scrapy.Field()
     racesurface = scrapy.Field()
+    trackvariant= scrapy.Field()
     racedistance=scrapy.Field()
     racenumber = scrapy.Field()
-    horsenumber = scrapy.Field()
-    horsecode = scrapy.Field()
+    racename = scrapy.Field()
+    localracetime = scrapy.Field()
+    utcracetime = scrapy.Field()
+    #####
+    ### to rd_runner
+    horsename = scrapy.Field() #to rdhorse and id to rd_runner
+    horsenumber = scrapy.Field() #to rdhorse
+    horsecode = scrapy.Field() #to rdhorse
     jockeycode = scrapy.Field()
+    jockeyname = scrapy.Field()
     trainercode = scrapy.Field()
-    totalstakes = scrapy.Field()
+    trainername = scrapy.Field()
+    seasonstakes = scrapy.Field()
     todaysrating = scrapy.Field()
     lastwonat = scrapy.Field()
     isMaiden = scrapy.Field()
-    invalid_dates = scrapy.Field()
-    owner = scrapy.Field()
+    ownername = scrapy.Field()
     gear = scrapy.Field()
     placing = scrapy.Field()
     finish_time = scrapy.Field()
@@ -60,4 +42,27 @@ class HorseItem(scrapy.Item):
     positions = scrapy.Field()
     timelist = scrapy.Field()
     priority = scrapy.Field()
-    seasonstakes = scrapy.Field()
+#SECOND
+class RaceItem(scrapy.Item):
+    #to rd_Race
+    racedate = scrapy.Field() #rd_raceid
+    racenumber = scrapy.Field()
+    racecoursecode =scrapy.Field()
+   
+    horsename = scrapy.Field() #rd_horse_id
+    tips = scrapy.Field()
+    naps = scrapy.Field() 
+    scmp_runner_comment = scrapy.Field()
+    totaljump = scrapy.Field()
+    totalcanter = scrapy.Field()
+    totalbarrier = scrapy.Field()
+    barriertimes = scrapy.Field()
+    jumptimes = scrapy.Field()
+    totalswim = scrapy.Field()
+
+
+
+
+
+
+   

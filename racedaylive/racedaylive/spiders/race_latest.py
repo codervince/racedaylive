@@ -173,8 +173,8 @@ class RaceSpider(scrapy.Spider):
         distance = None
         surface = None
         if surface_distance:
-            print "surface distance\n", 
-            print surface_distance
+            # print "surface distance\n", 
+            # print surface_distance
 
             # racedistance': u'Turf',  'racesurface': u'1800M',
             ## this line has: Turf, "B+2" Course, 1800M, Good To Firm
@@ -183,9 +183,13 @@ class RaceSpider(scrapy.Spider):
             # All Weather Track, 1200M, Fast len 3 
 
             surface = unicode.strip(unicode.split(surface_distance, u',')[0])
-            distance = unicode.strip(unicode.split(surface_distance, u',')[1].replace('M',''))
+            trackvariant = unicode.strip(unicode.split(surface_distance, u',')[1])
+            if surface != u'AWT':
+                surface = trackvariant
+            # get_racecoursecode
+            distance = unicode.strip(unicode.split(surface_distance, u',')[2].replace('M',''))
             #only if not current race!!
-            going = unicode.strip(unicode.split(surface_distance, u',')[2])
+            going = unicode.strip(unicode.split(surface_distance, u',')[3])
 
         racerating = None
         raceclass = None
@@ -219,11 +223,13 @@ class RaceSpider(scrapy.Spider):
             log.msg('code_set', level=log.INFO)
             log.msg(str(len(self.code_set)), level=log.INFO)
 
+            jockeyname_ = tr.xpath('td[7]/a/text()').extract()[0]
             jockeycode_ = tr.xpath('td[7]/a/@href').extract()[0]
             jockeycode = re.match(r"^[^\?]+\?jockeycode=(?P<code>\w+)'.*",
                 jockeycode_).groupdict()['code']
             
             ##TRAINER CODE
+            trainername_ = tr.xpath('td[10]/a/text()').extract()[0]
             trainercode_ = tr.xpath('td[10]/a/@href').extract()[0]
             trainercode = re.match(r"^[^\?]+\?trainercode=(?P<code>\w+)'.*",
                 trainercode_).groupdict()['code']
@@ -244,29 +250,31 @@ class RaceSpider(scrapy.Spider):
             request.meta.update(
                 localtime=localtime,
                 racename=racename,
-                racecourse=racecourse,
+                racecoursecode=get_racecoursecode(racecourse),
                 racesurface=surface,
                 racegoing= going,
-                racedistance=distance,
+                racedistance=get_distance(distance),
                 raceclass=raceclass,
-                racerating= racerating,
-                racedate = self.racedate,
-                horsenumber=horsenumber,
+                racerating= try_int(racerating),
+                racedate = getdateobject(self.racedate),
+                horsenumber=try_int(horsenumber),
                 horsename=horsename,
                 horsecode=horsecode,
                 jockeycode=jockeycode,
+                jockeyname=re.sub(r'\([^)]*\)', '', jockeyname_),
                 trainercode=trainercode,
-                todaysrating=todaysrating_,
+                trainername = trainername_,
+                todaysrating=try_int(todaysrating_),
                 owner=owner_,
                 gear=gear_,
-                draw=draw_,
-                placing=sec_time_data['placing'],
+                draw=try_int(draw_),
+                placing=get_placing(sec_time_data['placing']),
                 finish_time=get_sec(sec_time_data['finish_time']),
-                marginsbehindleader=sec_time_data['marginsbehindleader'],
-                positions=sec_time_data['positions'],
-                timelist=sec_time_data['timelist'],
-                seasonstakes = seasonstakes_,
-                priority = priority_
+                marginsbehindleader=map(horselengthprocessor, sec_time_data['marginsbehindleader']),
+                positions=map(try_int, sec_time_data['positions']),
+                timelist=sec_time_data['timelist'], #test get_sec
+                seasonstakes = try_int(seasonstakes_),
+                priority = get_priority(priority_)
             )
             yield request
 
@@ -304,8 +312,8 @@ class RaceSpider(scrapy.Spider):
         # todaysrc_track_course = getrc_track_course(response.meta['racecourse'], response.meta['racesurface'])
         # pprint.pprint(todaysrc_track_course) 
         ##DD isMdn
-        
-        invalid_dates = [i for i, x in enumerate(prev_dates) if datetime.strptime(x, '%d/%m/%Y') >= datetime.strptime(response.meta['racedate'], '%Y%m%d')] #20150527
+        # datetime.strptime(response.meta['racedate'], '%Y%m%d')
+        invalid_dates = [i for i, x in enumerate(prev_dates) if datetime.strptime(x, '%d/%m/%Y').date() >= response.meta["racedate"] ] #20150527
         valid_from_index = None
         win_indices = [i for i, x in enumerate(prev_places) if x == "01"]
         if len(invalid_dates) >0:
@@ -333,9 +341,9 @@ class RaceSpider(scrapy.Spider):
         ##TODO internalhorseindex - need racecourse
         yield items.HorseItem(
             racedate=response.meta['racedate'],
-            utcracetime = local2utc(getdateobject(response.meta['racedate']),response.meta['localtime']),
-            racecourse=response.meta['racecourse'],
-            raceclass=response.meta['raceclass'],
+            utcracetime = local2utc(response.meta['racedate'],response.meta['localtime']),
+            racecoursecode=response.meta['racecoursecode'],
+            raceclass=try_int(response.meta['raceclass']),
             racedistance=response.meta['racedistance'],
             racegoing=response.meta['racegoing'],
             racesurface=response.meta['racesurface'],
@@ -346,19 +354,21 @@ class RaceSpider(scrapy.Spider):
             horsename=unicode.strip(response.meta['horsename']),
             horsecode=response.meta['horsecode'],
             jockeycode=response.meta['jockeycode'],
+            jockeyname=response.meta['jockeyname'],
             trainercode=response.meta['trainercode'],
-            owner=response.meta['owner'],
-            totalstakes=cleanpm(unicode.strip(totalstakes)),
+            trainername=response.meta['trainername'],
+            ownername=response.meta['owner'],
+            # totalstakes=cleanpm(unicode.strip(totalstakes)),
             todaysrating=response.meta['todaysrating'],
-            gear=response.meta['gear'],
-            lastwonat = last_won_at,
+            gear=unicode.strip(response.meta['gear']),
+            lastwonat = get_rating(last_won_at),
             isMaiden = is_maiden,
-            placing=response.meta['placing'],
+            placing=try_int(response.meta['placing']),
             finish_time=response.meta['finish_time'],
             marginsbehindleader=response.meta['marginsbehindleader'],
             positions=response.meta['positions'],
             timelist=response.meta['timelist'],
-            priority=response.meta['priority'],
+            priority=removeunicode(response.meta['priority']),
             seasonstakes=response.meta['seasonstakes']
         )
 
@@ -385,6 +395,68 @@ class RaceSpider(scrapy.Spider):
                 tip_).groupdict()
             tips.update({tip['name']: tip['val'].replace(u'\xa0', u'')})
 
+        #per RACE return COLNAME tipster split
+        '''
+             'racenumber': 11,
+     'tips': {u'Alan Aitken': u'10  4  9  12',
+              u'Andrew Hawkins': u'10+ 4  6  9',
+              u'Brett Davis': u'4  3  10 9',
+              u'Michael Cox': u'4  3  9  8',
+              u'Most Favoured': u'4  10 3  9',
+              u'Phillip Woo': u'4  1  10 6',
+              u'Racing Post Online': u'4  10 9  1',
+              u'Shannon (vincent Wong)': u'4* 3  2  1'},
+        * NAP * SecondNap
+
+            t_system_id= db.Column(db.Integer, ForeignKey('t_system.id'))
+    t_raceday_id = db.Column(db.Integer, ForeignKey('t_raceday.id'))
+    t_race_id= db.Column(db.Integer, ForeignKey('t_race.id'))
+    horsenumber = db.Column(db.Integer)
+    nap1 =db.Column(db.Boolean)
+
+        '''
+        ordinals = {'1':'first', '2':'second', '3': 'third', '4':'fourth'}
+
+        naps = {}
+        for k,v in tips.items():
+            if k == u"Shannon (vincent Wong)":
+                newk = u"Shannon"
+            else:
+                newk = k
+            #take care of naps, nap2s and find
+            if (u'*' in v) or (u'+' in v):
+                first= v.split(" ")[0]
+                #first will be nap
+                if u'*' in first:
+                    nap1 = True
+                elif u'_' in first:
+                    nap1 = False
+                else:
+                    nap1 = None
+                if nap1 is not None:
+                    value_dict = {}
+                    value_dict.update({'t_system_name':k, 'horsenumber': first, 'nap1':nap1, })
+                    naps[newk] = value_dict
+        
+        new_tips = {}
+        for k,v in tips.items():
+            if k == u"Shannon (vincent Wong)":
+                newk = u"Shannon"
+            else:
+                newk = k
+            tips_value_dict = {}
+            vals = v.split(u' ')
+            vals = [v for v in vals if v != u'']
+            # print vals 
+            #remove naps+-
+            for i,_v in enumerate(vals):
+                newv = try_int(_v.replace(u'*', u'').replace(u'+', ''))
+                tips_value_dict.update({ordinals[str(i+1)]:newv})
+            new_tips[k] = tips_value_dict
+            # pprint.pprint(new_tips)
+            # log.msg(new_tips, level=log.INFO)
+
+        ##classify positive or negative? DB
         comments_url = 'http://racing.scmp.com/RaceCardPro/comment{}.asp'.format(
             response.meta['racenumber'])
 
@@ -393,9 +465,10 @@ class RaceSpider(scrapy.Spider):
 
             request = scrapy.Request(comments_url, callback=self.parse_comments)
             request.meta.update(response.meta)
-            request.meta.update(tips=tips)
+            request.meta.update(tips=new_tips)
+            request.meta.update(naps=naps)
             request.meta.update(horsename=horsename)
-            request.meta.update(racedate=self.racedate)
+            request.meta.update(racedate=getdateobject(self.racedate))
             request.meta.update(racecourse=self.racecoursecode)
             # request.meta.update(racecourse=event2_d['racecourse'])
             # request.meta.update(racetype=racetype)
@@ -423,32 +496,45 @@ class RaceSpider(scrapy.Spider):
 
         tr = response.xpath('//tr[td[2]//a[text() = "{}"]]'.format(
             response.meta['horsename']))
-
+        
         font = tr.xpath('td[8]/font')
 
+        ##times more useful
         totaljump_ = font.xpath('font[1]/text()').extract()[0]
-        totaljump = re.match(r'^Jump:[^\d]+(?P<num>\d+)$', totaljump_
-            ).groupdict()['num']
+        totaljump = re.match(r'^Jump:[^\d]+(?P<num>\d+)$', totaljump_).groupdict()['num']
+        # '//tr[ td[2]//a[text()="WINNING LEADER"]]/td[position()>2 and position() < 8]/font/font[@color="BROWN"]/text()'
+        jump_times = None
+        if totaljump >0:
+            jump_times_ = tr.xpath('/td[position()>2 and position() < 8]/font/font[@color="BROWN"]/text()').extract()
+            try:
+                jump_times = jump_times_[0]
+            except ValueError:
+                jump_times = None
 
         totalcanter_ = font.xpath('text()[2]').extract()[0][3:]
-        totalcanter = re.match(r'^.*Canter: (?P<num>\d+)$', totalcanter_
-            ).groupdict()['num']
+        totalcanter = re.match(r'^.*Canter: (?P<num>\d+)$', totalcanter_).groupdict()['num']
 
         totalbarrier_ = font.xpath('font[2]/text()').extract()[0]
-        totalbarrier = re.match(r'^Barrier: (?P<num>\d+)$', totalbarrier_
-            ).groupdict()['num']
+        totalbarrier = re.match(r'^Barrier: (?P<num>\d+)$', totalbarrier_).groupdict()['num']
+        barrier_times = None
+        if totalbarrier >0:
+            barrier_times_ = tr.xpath('/td[position()>2 and position() < 8]/font/a/font[@color="GREEN"]/text()').extract()
+            try:
+                barrier_times = barrier_times[0]
+            except ValueError:
+                barrier_times = None
 
         totalswim_ = font.xpath('text()[3]').extract()[0][7:]
         totalswim_match = re.match(r'^.*Swim: (?P<num>\d+)$', totalswim_
             )
         totalswim = totalswim_match and totalswim_match.groupdict()['num']
 
-        BTNumber_url = tr.xpath('td[4]//a/@href').extract()
-        BTNumber = None
-        if BTNumber_url:
-            BTNumber_re = re.match(r'../../Trackwork/barrier/2015/(?P<num>\d+).asp',
-                BTNumber_url[0])
-            BTNumber = BTNumber_re and BTNumber_re.groupdict()['num']
+        # BTNumber_url = tr.xpath('td[4]//a/@href').extract()
+        # BTNumber = None
+        # if BTNumber_url:
+        #     BTNumber_re = re.match(r'../../Trackwork/barrier/2015/(?P<num>\d+).asp',
+        #         BTNumber_url[0])
+        #     BTNumber = BTNumber_re and BTNumber_re.groupdict()['num']
 
         best_url = 'http://racing.scmp.com/statistic_chart/bestfinish{}.asp'
         request = scrapy.Request(best_url.format(response.meta['racenumber']),
@@ -458,27 +544,29 @@ class RaceSpider(scrapy.Spider):
         request.meta.update(totaljump=totaljump)
         request.meta.update(totalcanter=totalcanter)
         request.meta.update(totalbarrier=totalbarrier)
+        request.meta.update(barriertimes=barrier_times)
+        request.meta.update(jumptimes=jump_times)
         request.meta.update(totalswim=totalswim)
-        request.meta.update(BTNumber=BTNumber)
+        # request.meta.update(BTNumber=BTNumber)
 
         yield request
 
     def parse_best(self, response):
         # log bestfinishes
         scrapy.log.msg(response.url, level=scrapy.log.INFO)
-
+        ##DO WE NEED THIS?
         tr_selector = '//tr[td/font/b[text()="{horsename}"]] | //tr[td/font/b'\
             '[text()="{horsename}"]]/following-sibling::tr'.format(
             horsename=response.meta['horsename'])
-        besttimes = []
-        for i, tr in enumerate(response.xpath(tr_selector)):
-            if i > 0 and (tr.xpath('td/font/b/text()').extract() or
-                    not tr.xpath('td[1][not(font) and not(@colspan)]').extract()):
-                break
-            besttimes_ = tr.xpath('td[3]/font/text()').extract()[0]
-            besttimes.append(re.match(r'^.*\((?P<time>.+)\)$', besttimes_
-                ).groupdict()['time'])
-
+        # besttimes = []
+        # for i, tr in enumerate(response.xpath(tr_selector)):
+        #     if i > 0 and (tr.xpath('td/font/b/text()').extract() or
+        #             not tr.xpath('td[1][not(font) and not(@colspan)]').extract()):
+        #         break
+        #     besttimes_ = tr.xpath('td[3]/font/text()').extract()[0]
+        #     besttimes.append(re.match(r'^.*\((?P<time>.+)\)$', besttimes_
+        #         ).groupdict()['time'])
+        # pprint.pprint(besttimes)
         ##TOD raceindex
         ### ONLY CALL IF self.racedate NOT IN PAST 
         return items.RaceItem(
@@ -488,14 +576,17 @@ class RaceSpider(scrapy.Spider):
             racecoursecode = getrc(unicode(response.meta['racecourse'])),
             # racetype = response.meta['racetype'], 
             racenumber = try_int(response.meta['racenumber']),
-            internalraceindex = getinternalraceindex(response.meta['racedate'], getrc(unicode(response.meta['racecourse'])), try_int(response.meta['racenumber'])),
+            # internalraceindex = getinternalraceindex(response.meta['racedate'], getrc(unicode(response.meta['racecourse'])), try_int(response.meta['racenumber'])),
             
-            tips=response.meta['tips'],
-            comment=cleanstring(response.meta['comment']),
+            tips=response.meta['tips'], #name - > t_system_id, first, second, third fourth
+            naps=response.meta['naps'],
+            scmp_runner_comment=cleanstring(response.meta['comment']),
             totaljump=try_int(response.meta['totaljump']),
             totalcanter=try_int(response.meta['totalcanter']),
             totalbarrier=try_int(response.meta['totalbarrier']),
+            barriertimes=try_int(response.meta['barriertimes']),
+            jumptimes=try_int(response.meta['jumptimes']),
             totalswim=try_int(response.meta['totalswim']),
-            BTNumber=try_int(response.meta['BTNumber']),
+            # BTNumber=try_int(response.meta['BTNumber']),
             horsename=response.meta['horsename'],
         )

@@ -942,3 +942,1245 @@
 	 'scheduler/enqueued/memory': 69,
 	 'start_time': datetime.datetime(2015, 8, 26, 22, 29, 57, 395268)}
 2015-08-27 00:31:06+0200 [race] INFO: Spider closed (finished)
+2015-08-27 20:01:56+0200 [scrapy] INFO: Scrapy 0.24.4 started (bot: racedaylive)
+2015-08-27 20:01:56+0200 [scrapy] INFO: Optional features available: ssl, http11, boto
+2015-08-27 20:01:56+0200 [scrapy] INFO: Overridden settings: {'NEWSPIDER_MODULE': 'racedaylive.spiders', 'SPIDER_MODULES': ['racedaylive.spiders'], 'DUPEFILTER_CLASS': 'racedaylive.utils.DoNotFilter', 'LOG_FILE': 'scrapy_racedaylive_2015-08-27.log', 'BOT_NAME': 'racedaylive'}
+2015-08-27 20:01:56+0200 [scrapy] INFO: Enabled extensions: AutoThrottle, LogStats, TelnetConsole, CloseSpider, WebService, CoreStats, SpiderState
+2015-08-27 20:01:57+0200 [scrapy] INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, UserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+2015-08-27 20:01:57+0200 [scrapy] INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+2015-08-27 20:01:57+0200 [scrapy] INFO: Enabled item pipelines: 
+2015-08-27 20:01:57+0200 [race] INFO: Spider opened
+2015-08-27 20:01:57+0200 [race] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2015-08-27 20:01:57+0200 [scrapy] DEBUG: Telnet console listening on 127.0.0.1:6045
+2015-08-27 20:01:57+0200 [scrapy] DEBUG: Web service listening on 127.0.0.1:6102
+2015-08-27 20:01:58+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/login.asp> (referer: None)
+2015-08-27 20:02:04+0200 [race] DEBUG: Redirecting (302) to <GET http://racing.scmp.com/index.asp> from <POST http://racing.scmp.com/Login.asp>
+2015-08-27 20:02:07+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/index.asp> (referer: http://racing.scmp.com/login.asp)
+2015-08-27 20:02:09+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/racecardpro/racecardpro.asp> (referer: http://racing.scmp.com/index.asp)
+2015-08-27 20:02:11+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1> (referer: http://racing.scmp.com/racecardpro/racecardpro.asp)
+2015-08-27 20:02:11+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/1> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:11+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/1>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 86, in parse_results
+	    print sectional_time_url[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:02:11+0200 [race] INFO: Closing spider (finished)
+2015-08-27 20:02:11+0200 [race] INFO: Dumping Scrapy stats:
+	{'downloader/request_bytes': 2163,
+	 'downloader/request_count': 6,
+	 'downloader/request_method_count/GET': 5,
+	 'downloader/request_method_count/POST': 1,
+	 'downloader/response_bytes': 197742,
+	 'downloader/response_count': 6,
+	 'downloader/response_status_count/200': 5,
+	 'downloader/response_status_count/302': 1,
+	 'finish_reason': 'finished',
+	 'finish_time': datetime.datetime(2015, 8, 27, 18, 2, 11, 783284),
+	 'log_count/DEBUG': 8,
+	 'log_count/ERROR': 1,
+	 'log_count/INFO': 7,
+	 'request_depth_max': 4,
+	 'response_received_count': 5,
+	 'scheduler/dequeued': 6,
+	 'scheduler/dequeued/memory': 6,
+	 'scheduler/enqueued': 6,
+	 'scheduler/enqueued/memory': 6,
+	 'spider_exceptions/IndexError': 1,
+	 'start_time': datetime.datetime(2015, 8, 27, 18, 1, 57, 613360)}
+2015-08-27 20:02:11+0200 [race] INFO: Spider closed (finished)
+2015-08-27 20:02:41+0200 [scrapy] INFO: Scrapy 0.24.4 started (bot: racedaylive)
+2015-08-27 20:02:41+0200 [scrapy] INFO: Optional features available: ssl, http11, boto
+2015-08-27 20:02:41+0200 [scrapy] INFO: Overridden settings: {'NEWSPIDER_MODULE': 'racedaylive.spiders', 'SPIDER_MODULES': ['racedaylive.spiders'], 'DUPEFILTER_CLASS': 'racedaylive.utils.DoNotFilter', 'LOG_FILE': 'scrapy_racedaylive_2015-08-27.log', 'BOT_NAME': 'racedaylive'}
+2015-08-27 20:02:41+0200 [scrapy] INFO: Enabled extensions: AutoThrottle, LogStats, TelnetConsole, CloseSpider, WebService, CoreStats, SpiderState
+2015-08-27 20:02:43+0200 [scrapy] INFO: Enabled downloader middlewares: HttpAuthMiddleware, DownloadTimeoutMiddleware, UserAgentMiddleware, RetryMiddleware, DefaultHeadersMiddleware, MetaRefreshMiddleware, HttpCompressionMiddleware, RedirectMiddleware, CookiesMiddleware, ChunkedTransferMiddleware, DownloaderStats
+2015-08-27 20:02:43+0200 [scrapy] INFO: Enabled spider middlewares: HttpErrorMiddleware, OffsiteMiddleware, RefererMiddleware, UrlLengthMiddleware, DepthMiddleware
+2015-08-27 20:02:43+0200 [scrapy] INFO: Enabled item pipelines: 
+2015-08-27 20:02:43+0200 [race] INFO: Spider opened
+2015-08-27 20:02:43+0200 [race] INFO: Crawled 0 pages (at 0 pages/min), scraped 0 items (at 0 items/min)
+2015-08-27 20:02:43+0200 [scrapy] DEBUG: Telnet console listening on 127.0.0.1:6045
+2015-08-27 20:02:43+0200 [scrapy] DEBUG: Web service listening on 127.0.0.1:6102
+2015-08-27 20:02:44+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/login.asp> (referer: None)
+2015-08-27 20:02:46+0200 [race] DEBUG: Redirecting (302) to <GET http://racing.scmp.com/index.asp> from <POST http://racing.scmp.com/Login.asp>
+2015-08-27 20:02:49+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/index.asp> (referer: http://racing.scmp.com/login.asp)
+2015-08-27 20:02:52+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/racecardpro/racecardpro.asp> (referer: http://racing.scmp.com/index.asp)
+2015-08-27 20:02:54+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1> (referer: http://racing.scmp.com/racecardpro/racecardpro.asp)
+2015-08-27 20:02:55+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/1> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:56+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/11> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:57+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/10> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:57+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/10>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 86, in parse_results
+	    print sectional_time_url[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:02:57+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/9> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:57+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/9>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 86, in parse_results
+	    print sectional_time_url[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:02:58+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/8> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:58+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/8>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 86, in parse_results
+	    print sectional_time_url[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:02:58+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/7> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:58+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/7>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 86, in parse_results
+	    print sectional_time_url[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:02:59+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/6> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:59+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/6>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 86, in parse_results
+	    print sectional_time_url[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:02:59+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/5> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:02:59+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/5>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 86, in parse_results
+	    print sectional_time_url[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:03:00+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/4> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:01+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/2> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:01+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/3> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:02+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=1&All=0#Race1> (referer: http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/1)
+2015-08-27 20:03:03+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=11&All=0#Race11> (referer: http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/11)
+2015-08-27 20:03:03+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=4&All=0#Race4> (referer: http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/4)
+2015-08-27 20:03:04+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=2&All=0#Race2> (referer: http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/2)
+2015-08-27 20:03:04+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=3&All=0#Race3> (referer: http://racing.hkjc.com/racing/Info/Meeting/Results/English/Local/20150712/ST/3)
+2015-08-27 20:03:05+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1> (referer: http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=1&All=0)
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 1
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 2
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 3
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 4
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 5
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 6
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 7
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 8
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 9
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 10
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 11
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 12
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 13
+2015-08-27 20:03:05+0200 [scrapy] INFO: -------------------------------------------------
+2015-08-27 20:03:05+0200 [scrapy] INFO: code_set
+2015-08-27 20:03:05+0200 [scrapy] INFO: 14
+2015-08-27 20:03:05+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/11> (referer: http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=11&All=0)
+2015-08-27 20:03:05+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/11>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 157, in parse_race
+	    '//span[@class="bold"]/text()').extract()[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:03:06+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/4> (referer: http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=4&All=0)
+2015-08-27 20:03:06+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/4>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 157, in parse_race
+	    '//span[@class="bold"]/text()').extract()[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:03:06+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/2> (referer: http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=2&All=0)
+2015-08-27 20:03:06+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/2>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 157, in parse_race
+	    '//span[@class="bold"]/text()').extract()[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:03:07+0200 [race] DEBUG: Crawled (200) <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/3> (referer: http://www.hkjc.com/english/racing/display_sectionaltime.asp?RaceDate=12/07/2015&Raceno=3&All=0)
+2015-08-27 20:03:07+0200 [race] ERROR: Spider error processing <GET http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/3>
+	Traceback (most recent call last):
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/base.py", line 824, in runUntilCurrent
+	    call.func(*call.args, **call.kw)
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 638, in _tick
+	    taskObj._oneWorkUnit()
+	  File "/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/twisted/internet/task.py", line 484, in _oneWorkUnit
+	    result = next(self._iterator)
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 57, in <genexpr>
+	    work = (callable(elem, *args, **named) for elem in iterable)
+	--- <exception caught here> ---
+	  File "/Library/Python/2.7/site-packages/scrapy/utils/defer.py", line 96, in iter_errback
+	    yield next(it)
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/offsite.py", line 26, in process_spider_output
+	    for x in result:
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/referer.py", line 22, in <genexpr>
+	    return (_set_referer(r) for r in result or ())
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/urllength.py", line 33, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Library/Python/2.7/site-packages/scrapy/contrib/spidermiddleware/depth.py", line 50, in <genexpr>
+	    return (r for r in result or () if _filter(r))
+	  File "/Users/vmac/Documents/PROGRAMMING/PY/scrapy/Chabrov/racedaylive/racedaylive/racedaylive/spiders/race_latest.py", line 157, in parse_race
+	    '//span[@class="bold"]/text()').extract()[0]
+	exceptions.IndexError: list index out of range
+	
+2015-08-27 20:03:08+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=S035> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:08+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:08+0200 [scrapy] INFO: 1
+2015-08-27 20:03:08+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=S035>
+	{'finish_time': 109.33,
+	 'gear': u'P-',
+	 'horsecode': u'S035',
+	 'horsename': u'COOL PAL',
+	 'horsenumber': 7,
+	 'isMaiden': True,
+	 'jockeycode': u'WJH',
+	 'lastwonat': None,
+	 'marginsbehindleader': [u'2', u'1-1/2', u'3/4', u'SH', u'9', None],
+	 'owner': u'Derby Pal Syndicate',
+	 'placing': u'8',
+	 'positions': [u'6', u'1', u'1', u'2', u'8', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.07', u'21.62', u'24.33', u'24.84', u'24.47', None],
+	 'todaysrating': u'30',
+	 'totalstakes': 291.0,
+	 'trainercode': u'LAL',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:10+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=M377> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:10+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:10+0200 [scrapy] INFO: 2
+2015-08-27 20:03:10+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=M377>
+	{'finish_time': 109.71,
+	 'gear': u'H',
+	 'horsecode': u'M377',
+	 'horsename': u'SMART GUY',
+	 'horsenumber': 5,
+	 'isMaiden': False,
+	 'jockeycode': u'NGA',
+	 'lastwonat': u'026',
+	 'marginsbehindleader': [u'5-1/4', u'8-1/2', u'6', u'4-1/2', u'11-1/2', None],
+	 'owner': u'Jimmy Chung Kwok Man & Dominic Chung Won Lok',
+	 'placing': u'14',
+	 'positions': [u'13', u'12', u'12', u'13', u'14', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.59', u'22.46', u'23.93', u'24.60', u'24.13', None],
+	 'todaysrating': u'31',
+	 'totalstakes': 1958.1,
+	 'trainercode': u'HL',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:10+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=L393> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:10+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:10+0200 [scrapy] INFO: 3
+2015-08-27 20:03:10+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=L393>
+	{'finish_time': 108.75,
+	 'gear': u'B',
+	 'horsecode': u'L393',
+	 'horsename': u'SUPER STRIKE',
+	 'horsenumber': 6,
+	 'isMaiden': False,
+	 'jockeycode': u'SUA',
+	 'lastwonat': u'026',
+	 'marginsbehindleader': [u'4-1/2', u'7-1/2', u'5-3/4', u'3', u'5-1/2', None],
+	 'owner': u'Lau Yiu Chu',
+	 'placing': u'4',
+	 'positions': [u'11', u'11', u'11', u'10', u'4', None],
+	 'priority': u'\r\n        +\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.47', u'22.42', u'24.05', u'24.40', u'23.41', None],
+	 'todaysrating': u'31',
+	 'totalstakes': 4165.275,
+	 'trainercode': u'SA',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:10+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=M327> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:10+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:10+0200 [scrapy] INFO: 4
+2015-08-27 20:03:10+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=M327>
+	{'finish_time': 107.89,
+	 'gear': u'B',
+	 'horsecode': u'M327',
+	 'horsename': u'BAMBOO DANCE',
+	 'horsenumber': 4,
+	 'isMaiden': False,
+	 'jockeycode': u'MOJ',
+	 'lastwonat': u'034',
+	 'marginsbehindleader': [u'5-1/4', u'9-1/4', u'7-1/4', u'3-1/2', u'2', None],
+	 'owner': u'Ricky Wong Kin Chat & Helen Leung Yee Wan',
+	 'placing': u'1',
+	 'positions': [u'12', u'13', u'13', u'12', u'1', None],
+	 'priority': u'\r\n        +\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.59', u'22.58', u'24.01', u'24.24', u'22.47', None],
+	 'todaysrating': u'34',
+	 'totalstakes': 1922.55,
+	 'trainercode': u'HAD',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:12+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P268> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:12+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:12+0200 [scrapy] INFO: 5
+2015-08-27 20:03:12+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=P268>
+	{'finish_time': 109.26,
+	 'gear': u'B2',
+	 'horsecode': u'P268',
+	 'horsename': u'SMART UNION',
+	 'horsenumber': 3,
+	 'isMaiden': True,
+	 'jockeycode': u'CYT',
+	 'lastwonat': None,
+	 'marginsbehindleader': [u'2', u'1-1/2', u'3/4', u'SH', u'8-1/2', None],
+	 'owner': u'Stanley Tsang Ming Chit & Raymond Chu Wai Hang',
+	 'placing': u'7',
+	 'positions': [u'5', u'2', u'2', u'1', u'7', None],
+	 'priority': u'\r\n        +\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.07', u'21.86', u'24.21', u'24.72', u'24.40', None],
+	 'todaysrating': u'36',
+	 'totalstakes': 329.15,
+	 'trainercode': u'LKW',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:13+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P407> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:13+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:13+0200 [scrapy] INFO: 6
+2015-08-27 20:03:13+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=P407>
+	{'finish_time': 109.33,
+	 'gear': u'B',
+	 'horsecode': u'P407',
+	 'horsename': u'FRESH AND FRESH',
+	 'horsenumber': 2,
+	 'isMaiden': False,
+	 'jockeycode': u'YML',
+	 'lastwonat': u'--',
+	 'marginsbehindleader': [u'1/2', u'1-1/2', u'1-1/2', u'1', u'9', None],
+	 'owner': u'Wallace Tung Wai Wa',
+	 'placing': u'9',
+	 'positions': [u'1', u'3', u'3', u'4', u'9', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'13.75', u'22.18', u'24.33', u'24.76', u'24.31', None],
+	 'todaysrating': u'40',
+	 'totalstakes': 570.95,
+	 'trainercode': u'YPF',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:16+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P198> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:16+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:16+0200 [scrapy] INFO: 7
+2015-08-27 20:03:16+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=P198>
+	{'finish_time': 108.67,
+	 'gear': u'H/TT',
+	 'horsecode': u'P198',
+	 'horsename': u'CRUISE CONTROL',
+	 'horsenumber': 1,
+	 'isMaiden': False,
+	 'jockeycode': u'PZ',
+	 'lastwonat': u'043',
+	 'marginsbehindleader': [u'3-1/4', u'5-3/4', u'4-1/4', u'1-1/4', u'5', None],
+	 'owner': u'Patrick Raab Kroos',
+	 'placing': u'3',
+	 'positions': [u'8', u'10', u'8', u'5', u'3', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.27', u'22.34', u'24.09', u'24.36', u'23.61', None],
+	 'todaysrating': u'40',
+	 'totalstakes': 1756.125,
+	 'trainercode': u'FC',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:16+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/racecardpro/racecardpro01.asp> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:18+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P293> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:18+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:18+0200 [scrapy] INFO: 8
+2015-08-27 20:03:18+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=P293>
+	{'finish_time': 108.19,
+	 'gear': u'XB',
+	 'horsecode': u'P293',
+	 'horsename': u'HIGH SPEED METRO',
+	 'horsenumber': 14,
+	 'isMaiden': False,
+	 'jockeycode': u'CML',
+	 'lastwonat': u'019',
+	 'marginsbehindleader': [u'7-1/4', u'11-1/2', u'7-1/2', u'2-1/4', u'2', None],
+	 'owner': u'Metro Express Syndicate',
+	 'placing': u'2',
+	 'positions': [u'14', u'14', u'14', u'8', u'2', None],
+	 'priority': u'\r\n        1\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.91', u'22.62', u'23.69', u'24.00', u'22.97', None],
+	 'todaysrating': u'25',
+	 'totalstakes': 917.125,
+	 'trainercode': u'WS',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:19+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P017> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:19+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:19+0200 [scrapy] INFO: 9
+2015-08-27 20:03:19+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=P017>
+	{'finish_time': 109.16,
+	 'gear': u'\xa0',
+	 'horsecode': u'P017',
+	 'horsename': u'TELECOM PRINCE',
+	 'horsenumber': 13,
+	 'isMaiden': False,
+	 'jockeycode': u'CAN',
+	 'lastwonat': u'050',
+	 'marginsbehindleader': [u'4-1/2', u'3', u'3-3/4', u'1-1/4', u'8', None],
+	 'owner': u'Bobby Cheung King Chuen',
+	 'placing': u'6',
+	 'positions': [u'10', u'6', u'7', u'7', u'6', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.47', u'21.70', u'24.45', u'24.44', u'24.10', None],
+	 'todaysrating': u'28',
+	 'totalstakes': 1515.375,
+	 'trainercode': u'SCS',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:19+0200 [race] DEBUG: Redirecting (302) to <GET http://www.hkjc.com/english/racing/OtherHorse.asp?HorseNo=N130> from <GET http://www.hkjc.com/english/racing/horse.asp?horseno=N130>
+2015-08-27 20:03:20+0200 [race] DEBUG: Redirecting (302) to <GET http://www.hkjc.com/english/racing/OtherHorse.asp?HorseNo=P081> from <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P081>
+2015-08-27 20:03:22+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P163> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:22+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:22+0200 [scrapy] INFO: 10
+2015-08-27 20:03:22+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=P163>
+	{'finish_time': 109.46,
+	 'gear': u'TT',
+	 'horsecode': u'P163',
+	 'horsename': u'TRAVEL MASTER',
+	 'horsenumber': 10,
+	 'isMaiden': True,
+	 'jockeycode': u'TON',
+	 'lastwonat': None,
+	 'marginsbehindleader': [u'1-3/4',
+	                         u'2-3/4',
+	                         u'2-3/4',
+	                         u'2-1/4',
+	                         u'9-3/4',
+	                         None],
+	 'owner': u'Jason Wong Chun Tat',
+	 'placing': u'12',
+	 'positions': [u'3', u'5', u'6', u'9', u'12', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.03', u'22.10', u'24.33', u'24.76', u'24.24', None],
+	 'todaysrating': u'29',
+	 'totalstakes': 135.0,
+	 'trainercode': u'SWY',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:24+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=N192> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:24+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:24+0200 [scrapy] INFO: 11
+2015-08-27 20:03:24+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=N192>
+	{'finish_time': 109.42,
+	 'gear': u'\xa0',
+	 'horsecode': u'N192',
+	 'horsename': u'MIZZEN GREY',
+	 'horsenumber': 9,
+	 'isMaiden': False,
+	 'jockeycode': u'LWM',
+	 'lastwonat': u'031',
+	 'marginsbehindleader': [u'3', u'4-1/2', u'4-1/4', u'3-1/2', u'9-1/2', None],
+	 'owner': u'Mr & Mrs Stephen Lee Hoi Yin',
+	 'placing': u'10',
+	 'positions': [u'7', u'8', u'9', u'11', u'10', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.23', u'22.18', u'24.29', u'24.72', u'24.00', None],
+	 'todaysrating': u'29',
+	 'totalstakes': 1105.65,
+	 'trainercode': u'NTK',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:25+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/horse.asp?horseno=P237> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:25+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:25+0200 [scrapy] INFO: 12
+2015-08-27 20:03:25+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/horse.asp?horseno=P237>
+	{'finish_time': 109.43,
+	 'gear': u'E/P/XB2',
+	 'horsecode': u'P237',
+	 'horsename': u'CRIMSON HEART',
+	 'horsenumber': 8,
+	 'isMaiden': True,
+	 'jockeycode': u'LHW',
+	 'lastwonat': None,
+	 'marginsbehindleader': [u'4', u'4-3/4', u'2-3/4', u'1/2', u'9-3/4', None],
+	 'owner': u'Dream Team Syndicate',
+	 'placing': u'11',
+	 'positions': [u'9', u'9', u'5', u'3', u'11', None],
+	 'priority': u'\r\n        +\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.39', u'22.06', u'24.01', u'24.48', u'24.49', None],
+	 'todaysrating': u'29',
+	 'totalstakes': 377.875,
+	 'trainercode': u'MA',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:26+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:27+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:28+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:29+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:29+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:30+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:30+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:30+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:30+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:31+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:31+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:32+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:32+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:33+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:34+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:34+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/RaceCardPro/comment01.asp> (referer: http://racing.scmp.com/racecardpro/racecardpro01.asp)
+2015-08-27 20:03:34+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/OtherHorse.asp?HorseNo=N130> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:34+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:34+0200 [scrapy] INFO: 13
+2015-08-27 20:03:34+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/OtherHorse.asp?HorseNo=N130>
+	{'finish_time': 109.6,
+	 'gear': u'H2',
+	 'horsecode': u'N130',
+	 'horsename': u'HAPPY KAISER',
+	 'horsenumber': 12,
+	 'isMaiden': False,
+	 'jockeycode': u'LDE',
+	 'lastwonat': u' \r\n      ',
+	 'marginsbehindleader': [u'1/2',
+	                         u'2-1/4',
+	                         u'2-1/4',
+	                         u'1-1/4',
+	                         u'10-3/4',
+	                         None],
+	 'owner': u'Patrick Luk Wing Tong',
+	 'placing': u'13',
+	 'positions': [u'2', u'4', u'4', u'6', u'13', None],
+	 'priority': u'\r\n        *\xa01\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'13.83', u'22.22', u'24.33', u'24.68', u'24.54', None],
+	 'todaysrating': u'28',
+	 'totalstakes': 1250.625,
+	 'trainercode': u'MKL',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:34+0200 [race] DEBUG: Crawled (200) <GET http://www.hkjc.com/english/racing/OtherHorse.asp?HorseNo=P081> (referer: http://racing.hkjc.com/racing/Info/Meeting/RaceCard/English/Local/20150712/ST/1)
+2015-08-27 20:03:34+0200 [scrapy] INFO: RaceSpider.count_unique_horse_request
+2015-08-27 20:03:34+0200 [scrapy] INFO: 14
+2015-08-27 20:03:34+0200 [race] DEBUG: Scraped from <200 http://www.hkjc.com/english/racing/OtherHorse.asp?HorseNo=P081>
+	{'finish_time': 109.13,
+	 'gear': u'H/TT',
+	 'horsecode': u'P081',
+	 'horsename': u'TAI PO FORTUNE',
+	 'horsenumber': 11,
+	 'isMaiden': False,
+	 'jockeycode': u'STH',
+	 'lastwonat': u' \r\n      ',
+	 'marginsbehindleader': [u'1-3/4', u'4-1/4', u'5', u'4-1/2', u'7-3/4', None],
+	 'owner': u'Jeanne Lee Sai Yin',
+	 'placing': u'5',
+	 'positions': [u'4', u'7', u'10', u'14', u'5', None],
+	 'priority': u'\r\n        1\r\n    ',
+	 'raceclass': u'5',
+	 'racecourse': u'Sha Tin',
+	 'racedate': '20150712',
+	 'racedistance': u'"B+2" Course',
+	 'racegoing': u'1800M',
+	 'racename': u'PLANET RULER HANDICAP',
+	 'racenumber': 1,
+	 'racerating': u'40-15',
+	 'racesurface': u'Turf',
+	 'seasonstakes': u'g',
+	 'timelist': [u'14.03', u'22.34', u'24.45', u'24.76', u'23.55', None],
+	 'todaysrating': u'18',
+	 'totalstakes': 536.563,
+	 'trainercode': u'YTP',
+	 'utcracetime': datetime.datetime(2015, 7, 12, 4, 30)}
+2015-08-27 20:03:34+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:34+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:34+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:35+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:38+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:38+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:38+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:39+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:39+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:39+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:39+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:40+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:40+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:40+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:40+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 626483,
+	 'comment': u'',
+	 'horsename': u'GOLD FORTUNE',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 1,
+	 'totalcanter': 20,
+	 'totaljump': 2,
+	 'totalswim': 0}
+2015-08-27 20:03:40+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:40+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:40+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Never likely in his opening four runs, then kept on steadily for third over 1,400m despite losing ground at one point before a fading mile 10th following a gun run. Does get this trip. --',
+	 'horsename': u'HAPPY KAISER',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 17,
+	 'totaljump': 3,
+	 'totalswim': 0}
+2015-08-27 20:03:40+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:41+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/Trackwork/Summary/Summary01.asp> (referer: http://racing.scmp.com/RaceCardPro/comment01.asp)
+2015-08-27 20:03:41+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:41+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:41+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Just a couple fifths over 1,400m and a mile at the Valley from 15 starts this term. Hard to see him waking up over this trip. --',
+	 'horsename': u'TAI PO FORTUNE',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 16,
+	 'totaljump': 2,
+	 'totalswim': 0}
+2015-08-27 20:03:41+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:41+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:41+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Dashed nicely for a 2,200m win at the Valley in April, then was twice second over 1,800m and 2,000m before just missing the board in two of his past three starts. Place hope. --',
+	 'horsename': u'HIGH SPEED METRO',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 17,
+	 'totaljump': 1,
+	 'totalswim': 0}
+2015-08-27 20:03:41+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:41+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:41+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u"Ran on for minor cheques four times up to 2,000m with a drop into Class Five and did have excuses when copping a check 300m out in a recent failure. Can't write off --",
+	 'horsename': u'TELECOM PRINCE',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 17,
+	 'totaljump': 2,
+	 'totalswim': 0}
+2015-08-27 20:03:41+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:41+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:41+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Has only finished thereabouts without menacing in three of his past four at this level, including a closing sixth and seventh in his past two over 1,800m on the dirt from wide gates. --',
+	 'horsename': u'CRIMSON HEART',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 19,
+	 'totaljump': 1,
+	 'totalswim': 0}
+2015-08-27 20:03:41+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:41+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:41+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u"Stayed on for minor cheques on both surfaces in three of his five starts but hasn't raced since January following colic surgery a month later. Didn't impress in a recent dirt trial. --",
+	 'horsename': u'MIZZEN GREY',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 1,
+	 'totalcanter': 7,
+	 'totaljump': 5,
+	 'totalswim': 0}
+2015-08-27 20:03:42+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:42+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:42+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Resumed an every chance third over 1,200m and failed to menace four times up to 1,400m following a stress fracture in November. --',
+	 'horsename': u'TRAVEL MASTER',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 15,
+	 'totaljump': 3,
+	 'totalswim': 0}
+2015-08-27 20:03:42+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:42+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:42+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Showed some spark in four of his first seven runs in Class Five and just got the timing right for a 2,200m win at the Valley last month. Keep safe with a pound less to carry. --',
+	 'horsename': u'SUPER STRIKE',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 16,
+	 'totaljump': 2,
+	 'totalswim': 0}
+2015-08-27 20:03:43+0200 [race] INFO: Crawled 79 pages (at 79 pages/min), scraped 23 items (at 23 items/min)
+2015-08-27 20:03:43+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:43+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:43+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u"Pressed the pace from a wide gate for a mile second in January but hasn't come close in his next five outings, including a weak effort following a handy run last Sunday for his new trainer. --",
+	 'horsename': u'COOL PAL',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 16,
+	 'totaljump': 3,
+	 'totalswim': 0}
+2015-08-27 20:03:43+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:43+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:43+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Some respectable runs in Class Four, including a near 1,800m win at the Valley in December. Faltered after a handy run over 2,200m at this level in May. The trip suits better and has a new trainer. --',
+	 'horsename': u'SMART UNION',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 12,
+	 'totaljump': 6,
+	 'totalswim': 0}
+2015-08-27 20:03:43+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:43+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:43+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Ran on without menacing from behind midfield last month but did get up two back over the 2,200m for a second win from 11 other starts. Will map well in the run. --',
+	 'horsename': u'SMART GUY',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 17,
+	 'totaljump': 0,
+	 'totalswim': 0}
+2015-08-27 20:03:43+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:43+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:43+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Solid form in three outings after a stable change, including two recent rallying wins over a mile as the favourite. Has a tricky gate and needs to lift on his past C&D form. --',
+	 'horsename': u'BAMBOO DANCE',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 20,
+	 'totaljump': 2,
+	 'totalswim': 0}
+2015-08-27 20:03:43+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:43+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:43+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u"Has run on for placings three times over 2,000m following early season AWT wins over 1,800m in Class Five and a mile in Class Four. Can't write off. --",
+	 'horsename': u'CRUISE CONTROL',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 0,
+	 'totalcanter': 18,
+	 'totaljump': 0,
+	 'totalswim': 0}
+2015-08-27 20:03:44+0200 [race] DEBUG: Crawled (200) <GET http://racing.scmp.com/statistic_chart/bestfinish01.asp> (referer: http://racing.scmp.com/Trackwork/Summary/Summary01.asp)
+2015-08-27 20:03:44+0200 [scrapy] INFO: http://racing.scmp.com/statistic_chart/bestfinish01.asp
+2015-08-27 20:03:44+0200 [race] DEBUG: Scraped from <200 http://racing.scmp.com/statistic_chart/bestfinish01.asp>
+	{'BTNumber': 0,
+	 'comment': u'Best at the Valley for a speed-tracking mile fifth and front-running fourth two back over 1,800m from 11 starts. Had excuses from a wide gate in a recent AWT defeat. Class drop may help. --',
+	 'horsename': u'FRESH AND FRESH',
+	 'internalraceindex': None,
+	 'racecoursecode': u'ST',
+	 'racedate': '20150712',
+	 'racenumber': 1,
+	 'tips': {u'Alan Aitken': u'4  14 6  5',
+	          u'Andrew Hawkins': u'4  14 1  3',
+	          u'Brett Davis': u'4  1  5  6',
+	          u'Michael Cox': u'4  1  14 12',
+	          u'Most Favoured': u'4  1  14 6',
+	          u'Phillip Woo': u'2  4  6  1',
+	          u'Racing Post Online': u'4  3  6  5',
+	          u'Shannon (vincent Wong)': u'4  1  2  3'},
+	 'totalbarrier': 1,
+	 'totalcanter': 14,
+	 'totaljump': 3,
+	 'totalswim': 0}
+2015-08-27 20:03:44+0200 [race] INFO: Closing spider (finished)
+2015-08-27 20:03:44+0200 [race] INFO: Dumping Scrapy stats:
+	{'downloader/request_bytes': 35530,
+	 'downloader/request_count': 88,
+	 'downloader/request_method_count/GET': 87,
+	 'downloader/request_method_count/POST': 1,
+	 'downloader/response_bytes': 4649954,
+	 'downloader/response_count': 88,
+	 'downloader/response_status_count/200': 85,
+	 'downloader/response_status_count/302': 3,
+	 'finish_reason': 'finished',
+	 'finish_time': datetime.datetime(2015, 8, 27, 18, 3, 44, 117410),
+	 'item_scraped_count': 29,
+	 'log_count/DEBUG': 119,
+	 'log_count/ERROR': 10,
+	 'log_count/INFO': 93,
+	 'request_depth_max': 10,
+	 'response_received_count': 85,
+	 'scheduler/dequeued': 88,
+	 'scheduler/dequeued/memory': 88,
+	 'scheduler/enqueued': 88,
+	 'scheduler/enqueued/memory': 88,
+	 'spider_exceptions/IndexError': 10,
+	 'start_time': datetime.datetime(2015, 8, 27, 18, 2, 43, 79091)}
+2015-08-27 20:03:44+0200 [race] INFO: Spider closed (finished)

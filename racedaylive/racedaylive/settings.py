@@ -26,5 +26,10 @@ DUPEFILTER_CLASS = 'racedaylive.utils.DoNotFilter'
 LOG_FILE = "scrapy_%s_%s.log" % ('racedaylive', datetime.now().date())
 # LOG_FILE = 'C:/Users/Simon/RACING/SCRAPY/racedaylive/racedaylive/log.txt'
 
+DOWNLOAD_DELAY = 0.25    # 250 ms of delay
+
 AUTOTHROTTLE_ENABLED = True
+
+SCMP_USER = 'luckyvince'
+SCMP_PASSWORD = 'invader'
 

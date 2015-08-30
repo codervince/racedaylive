@@ -34,15 +34,66 @@ import math
 #     return parse_mixed_fraction(lbw)
 
 ### RAILTYPE INFO
+def get_correct_tips_format(raceitem):
+    rtn = {}
+    for t in np.array(raceitem['tips'].items()):
+        # rtn[str(t[0])] = t[1]
+        newplaces = [ t for t in t[1].split(' ') if i != u' ']
+        if len(newplaces) == 4:
+            first,second, third, fourth = newplaces.split(' ')
+        else:
+            first,second, third = newplaces.split(' ')
+        print newplaces
+        # rtn[k].append(first).append(second).append(third)
+    return rtn
+
+'''
+distance string to int
+removes m returns int
+'''
+def get_distance(d):
+    if 'M' in d or 'm' in d:
+        d = d.replace('m').replace('M')
+    return try_int(d)
+
+def get_priority(value):
+    return unicode.strip(value)
+
+def get_rating(ratingstr):
+    return try_int(ratingstr)
+
+def getdateobject(date_str):
+    #two variants on retired its %Y, on old its %y which is '15, on newform its '15 too
+    if len(date_str) ==10:
+        return datetime.strptime(date_str, '%d/%m/%Y')
+    elif len(date_str) == 8:
+        return datetime.strptime(date_str, '%d/%m/%y')
+    else:
+        raise ValueError
+
+def get_racecoursecode(longname):
+    if longname == 'Sha Tin':
+        return 'ST'
+    if longname == 'Happy Valley':
+        return 'HV'
+    else:
+        return None
+
+def removeunicode(value):
+    return value.encode('ascii', 'ignore')
 
 def get_sec(s):
     if isinstance(s, list):
         s = s[0]
-    if s == '--':
+    if s == '--' or s == '---':
         return None
-    l = s.split('.') #array min, secs, milli - we want seconds
+    try:
+        l = s.split('.') #array min, secs, milli - we want seconds
     # l[0]*60 + l[1] + l[2]/60.0
-    return float(l[0])*60 + float(l[1]) + (float(l[2])*0.01)
+        if len(l) == 3:
+            return float(l[0])*60 + float(l[1]) + (float(l[2])*0.01)
+    except ValueError:
+        return s
 
 def cleanstring(s):
     pattern = re.compile(r'\s+')
@@ -262,6 +313,15 @@ def processscmpplace(place):
     else:
         return try_int(place)
 
+def get_placing(place):
+    place99 = ['DISQ', 'DNF', 'FE', 'PU', 'TNP', 'UR', 'VOID', 'WD', 'WR', 'WV', 'WV-A', 'WX', 'WX-A']
+    if place is None:
+        return None
+    elif place in place99:
+        return 99
+# r_dh = r'.*[0-9].*DH$'
+    else:
+        return try_int(place)
 
 
 def timeprocessor(value):
@@ -275,7 +335,8 @@ def timeprocessor(value):
 
 def horselengthprocessor(value):
     #covers '' and '-'
-
+    if value is None:
+        return None
     if '---' in value:
         return None
     elif value == '-':
