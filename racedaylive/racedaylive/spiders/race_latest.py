@@ -7,6 +7,7 @@ from datetime import datetime, date
 from racedaylive.utilities import *
 from dateutil.parser import parse
 import pprint
+from collections import *
 
 class RaceSpider(scrapy.Spider):
 
@@ -14,18 +15,25 @@ class RaceSpider(scrapy.Spider):
     allowed_domains = ['racing.scmp.com', 'hkjc.com']
     count_all_horse_requests = 0
     count_unique_horse_request = 0
+    todaysdate = datetime.today().date()
+    historical = 1
     code_set = set()
+    runners_list = defaultdict(list)
     
-    def __init__(self, racedate, coursecode, *args, **kwargs):
+    def __init__(self, racedate, coursecode, historical, *args, **kwargs):
         assert coursecode in ['ST', 'HV']
         assert len(racedate) == 8 and racedate[:2] == '20'
-        
+        assert historical in ['0', '1']
+
         super(RaceSpider, self).__init__(*args, **kwargs)
         self.hkjc_domain = 'racing.hkjc.com'
         self.domain = 'hkjc.com'
         self.racedate = racedate
+        self.historical = int(historical)
         self.racecoursecode = coursecode
-        self.races_url = 'http://{domain}/racing/Info/Meeting/RaceCard'\
+        self.inputdate = datetime.strptime(racedate, "%Y%m%d").date()
+        self.tips_url = 'http://racing.scmp.com/Tips/tips.asp'
+        self.hkjcraces_url = 'http://{domain}/racing/Info/Meeting/RaceCard'\
             '/English/Local/{racedate}/{coursecode}/1'.format(
                 domain=self.hkjc_domain,
                 racedate=racedate, 
@@ -35,30 +43,309 @@ class RaceSpider(scrapy.Spider):
         self.start_urls = [
             'http://racing.scmp.com/login.asp'
         ]
-
+    #BOTH
     def parse(self, response):
         return scrapy.http.FormRequest.from_response(
             response,
             formdata={'Login': 'luckyvince', 'Password': 'invader'},
             callback=self.after_login,
         )
-
+    #BOTH
     def after_login(self, response):
-        return scrapy.Request(self.after_login_url, callback=self.parse_scmp_date)
+        return scrapy.Request(self.after_login_url, callback=self.parse_scmp_racecardpro)
 
-    def parse_scmp_date(self, response):
+    #BOTH
+    def parse_scmp_racecardpro(self, response):
 
+        ##get racedate
         date_str = response.xpath('//b[contains(text(), "Race 1")]/text()').extract()[0]
         date_dict = re.match(r'^(?P<day>\d\d)-(?P<month>\d\d)-(?P<year>\d\d\d\d).*',
             date_str).groupdict()
         latest_race_date = datetime(int(date_dict['year']), int(date_dict['month']), 
             int(date_dict['day']))
-
-        request = scrapy.Request(self.races_url, callback=self.parse_races)
+        # http://racing.scmp.com/Tips/tips.asp
+        request = scrapy.Request(self.tips_url, callback=self.parse_scmptips) 
+        # request = scrapy.Request(self.hkjcraces_url, callback=self.parse_races)
         request.meta.update(response.meta)
         request.meta['latest_race_date'] = latest_race_date
         return request
 
+
+    def parse_scmptips(self,response):
+
+        _thedate = response.xpath('//tr/td/font/b[contains(text(),"Sunday")'
+            'or contains(text(),"Wednesday") or contains(text(),"Saturday") or contains(text(),"Tuesday")'
+            ' or contains(text(),"Thursday")]/text()').extract()[0]
+        #Sunday, July 12, 2015
+
+        thedate = datetime.strptime(_thedate, "%A, %B %d, %Y").date()
+        print thedate
+        if abs((thedate - self.inputdate).days) >4:
+            #no current tips data go to HKJC
+            request = scrapy.Request(self.hkjcraces_url, callback=self.parse_hkjc_races)
+            request.meta.update(response.meta)
+        else:
+            # GO TO TIPS AND COMMENTS HERE
+            request = scrapy.Request(self.hkjcraces_url, callback=self.parse_races)
+            request.meta.update(response.meta)
+        return request
+
+    def parse_hkjc_races(self, response):
+        #HKJC racecard
+        race_paths = response.xpath('//td[@nowrap="nowrap" and @width="24px"]'
+            '/a/@href').extract()
+        card_urls = ['http://{domain}{path}'.format(
+                domain=self.hkjc_domain,
+                path=path,
+            ) for path in race_paths
+        ] + [response.url]
+        # result_urls = [_url.replace('RaceCard', 'Results') for _url in card_urls]
+        for card_url in card_urls:
+        #     if int(card_url.split('/')[-1]) > 9:
+        #         racenumber = '{}'.format(card_url.split('/')[-1])
+        #     else:
+        #         racenumber = '0{}'.format(card_url.split('/')[-1])
+            request = scrapy.Request(card_url, callback=self.parse_hkjc_racecard)
+            request.meta.update(response.meta)
+            # request.meta['racenumber'] = racenumber
+            request.meta['card_url'] = card_url
+            yield request
+
+    def parse_hkjc_racecard(self, response):
+        
+        racename_ = response.xpath('//table[@class="font13 lineH20 tdAlignL"]'
+            '//span[@class="bold"]/text()').extract()[0]
+        racename = re.match(r'^Race \d+.{3}(?P<name>.+)$', racename_
+            ).groupdict()['name']
+        card_url = response.url
+        if int(card_url.split('/')[-1]) > 9:
+            _racenumber = '{}'.format(card_url.split('/')[-1])
+        else:
+            _racenumber = '0{}'.format(card_url.split('/')[-1])
+        # data only avail from sectionals if historical
+        _marginsbehindleader = None
+        _placing = None
+        _finishtime = None
+        _positions = None
+        _timelist = None
+        if self.historical:
+            sec_time_data = response.meta['sectional_time_data'][(horsecode, response.meta['racenumber'])]
+            _marginsbehindleader = map(horselengthprocessor, sec_time_data['marginsbehindleader'])
+            _placing = get_placing(sec_time_data['placing'])
+            _finishtime = get_sec(sec_time_data['finish_time'])
+            _positions = map(try_int, sec_time_data['positions'])
+            _timelist = sec_time_data['timelist']
+        raceinfo_ = response.xpath('//table[@class="font13 lineH20 tdAlignL"]//descendant::text()[ancestor::td and normalize-space(.) != ""][position()>=2]').extract()
+        date_racecourse_localtime = cleanstring(raceinfo_[0])
+        surface_distance = cleanstring(raceinfo_[1])
+        prize_rating_class = cleanstring(raceinfo_[2])
+        
+        racecourse = None
+        localtime= None
+        if date_racecourse_localtime:
+             
+            racecourse = unicode.strip(unicode.split(date_racecourse_localtime, u',')[-2])
+            localtime = unicode.strip(unicode.split(date_racecourse_localtime, u',')[-1])
+        distance = None
+        surface = None
+        if surface_distance:
+            # print "surface distance\n", 
+            # print surface_distance
+
+            # racedistance': u'Turf',  'racesurface': u'1800M',
+            ## this line has: Turf, "B+2" Course, 1800M, Good To Firm
+            #other lines have Turf, "C" Course, 1000M, Good To Firm
+            # Turf, "C" Course, 1800M, Good
+            # All Weather Track, 1200M, Fast len 3 
+
+            surface = unicode.strip(unicode.split(surface_distance, u',')[0])
+            trackvariant = unicode.strip(unicode.split(surface_distance, u',')[1])
+            if surface != u'AWT':
+                surface = trackvariant
+            # get_racecoursecode
+            distance = unicode.strip(unicode.split(surface_distance, u',')[2].replace('M',''))
+            #only if not current race!!
+        going = None
+        if self.historical:
+            going = unicode.strip(unicode.split(surface_distance, u',')[3])
+        racerating = None
+        raceclass = None
+        if prize_rating_class:
+            racerating = unicode.strip(unicode.split(prize_rating_class, u',')[-2].replace(u'Rating:', ''))
+            raceclass = unicode.strip(unicode.split(prize_rating_class, u',')[-1].replace(u'Class', ''))
+
+        ##RaceType racecourse numberofrunners surface distance going
+
+        # Turf, "A" Course
+        # surface = re.match(r'^[^,](?P<surface>.+),.*', raceinfo_).groupdict()['surface']
+
+        # pprint.pprint(surface_distance)
+        # pprint.pprint(prize_rating_class)
+        # racerating = re.match(r'^Rating:\d{2-3}-\d{2-3}(?P<rating>.+).*', raceinfo_).groupdict()['rating']
+
+        ### RaceCategory RACETIME SURFACE DISTANCE GOING 
+        ### PM RATING CLASS  
+        ##season_stakes and priority
+        for tr in response.xpath('(//table[@class="draggable hiddenable"]//tr)'
+                '[position() > 1]'):
+
+            horsenumber = tr.xpath('td[1]/text()').extract()[0]
+            horsename = tr.xpath('td[4]/a/text()').extract()[0]
+            horse_path = tr.xpath('td[4]/a/@href').extract()[0]
+            horse_url = 'http://www.{domain}/english/racing/{path}&Option=1#htop'.format(
+                domain=self.domain, path=horse_path)
+            horsecode_ = tr.xpath('td[4]/a/@href').extract()[0]
+            horsecode = re.match(r"^[^\?]+\?horseno=(?P<code>\w+)'.*$",
+                horsecode_).groupdict()['code']
+            self.code_set.add(horsecode)
+            self.runners_list[_racenumber].append(horsecode)
+            log.msg('-------------------------------------------------', level=log.INFO)
+            log.msg('code_set', level=log.INFO)
+            log.msg(str(len(self.code_set)), level=log.INFO)
+
+            jockeyname_ = tr.xpath('td[7]/a/text()').extract()[0]
+            jockeycode_ = tr.xpath('td[7]/a/@href').extract()[0]
+            jockeycode = re.match(r"^[^\?]+\?jockeycode=(?P<code>\w+)'.*",
+                jockeycode_).groupdict()['code']
+            
+            ##TRAINER CODE
+            trainername_ = tr.xpath('td[10]/a/text()').extract()[0]
+            trainercode_ = tr.xpath('td[10]/a/@href').extract()[0]
+            trainercode = re.match(r"^[^\?]+\?trainercode=(?P<code>\w+)'.*",
+                trainercode_).groupdict()['code']
+
+            todaysrating_ = tr.xpath('td[11]/text()').extract()[0]
+            owner_ = tr.xpath('td[22]/text()').extract()[0]
+            gear_ = tr.xpath('td[21]/text()').extract()[0]
+
+            seasonstakes_ = tr.xpath('td[18]/text()').extract()[0]
+            priority_ = tr.xpath('td[20]/text()').extract()[0]
+            draw_ = tr.xpath('td[8]/text()').extract()[0]
+
+
+            request = scrapy.Request('http://www.hkjc.com/english/racing/horse.'
+                'asp?horseno={}'.format(horsecode), callback=self.parse_horse)
+            
+            request.meta.update(response.meta)
+            request.meta.update(
+                localtime=localtime,
+                racename=racename,
+                racecoursecode=get_racecoursecode(racecourse),
+                racesurface=surface,
+                racenumber=_racenumber,
+                racegoing= going,
+                racedistance=get_distance(distance),
+                raceclass=raceclass,
+                racerating= try_int(racerating),
+                racedate = getdateobject(self.racedate),
+                horsenumber=try_int(horsenumber),
+                horsename=horsename,
+                horsecode=horsecode,
+                horse_url= horse_url,
+                jockeycode=jockeycode,
+                jockeyname=re.sub(r'\([^)]*\)', '', jockeyname_),
+                trainercode=trainercode,
+                trainername = trainername_,
+                todaysrating=try_int(todaysrating_),
+                owner=owner_,
+                gear=gear_,
+                draw=try_int(draw_),
+                placing=_placing,
+                finish_time=_finishtime,
+                marginsbehindleader=_marginsbehindleader,
+                positions=_positions,
+                timelist=_timelist, #test get_sec
+                seasonstakes = try_int(seasonstakes_),
+                priority = get_priority(priority_)
+            )
+            yield request
+
+    def parse_horse(self, response):
+        RaceSpider.count_unique_horse_request += 1
+        log.msg('RaceSpider.count_unique_horse_request', level=log.INFO)
+        log.msg(str(RaceSpider.count_unique_horse_request), level=log.INFO)
+        
+        ## GET SEASON STAKES INSTEAD
+        totalstakes = response.xpath('//td[preceding-sibling::td[1]/font['
+            'text() = "Total Stakes*"]]/font/text()').extract()[0]
+
+        #DD - previousruns: Place, Date, Rating
+        prev_places = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=2]//font/text()").extract()
+        prev_dates = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=3]//font/text()").extract()
+        # remove  u'\r\n\t\t'
+        prev_dates = [ x for x in prev_dates if x != u'\r\n\t\t']
+
+        prev_ratings = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=9]/text()").extract()
+
+        prev_distances = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=5]/text()").extract()
+        prev_rc_track_course  = response.xpath("//table[@class='bigborder']//tr[position()>1]//td[position()=4]/text()").extract()
+        # pprint.pprint(prev_places)
+        # pprint.pprint(prev_dates)
+        #todays rc track course racecoursecode\s/\s #ST / "Turf" / "A+3 "    ST / "AWT" / "-" 
+        # todaysrc_track_course = getrc_track_course(response.meta['racecourse'], response.meta['racesurface'])
+        # pprint.pprint(todaysrc_track_course) 
+        ##DD isMdn
+        # datetime.strptime(response.meta['racedate'], '%Y%m%d')
+        invalid_dates = [i for i, x in enumerate(prev_dates) if datetime.strptime(x, '%d/%m/%Y').date() >= response.meta["racedate"] ] #20150527
+        valid_from_index = None
+        win_indices = [i for i, x in enumerate(prev_places) if x == "01"]
+        if len(invalid_dates) >0:
+            valid_from_index = max(invalid_dates) 
+            win_indices = win_indices[valid_from_index:]
+
+        is_maiden = False
+
+        if len(win_indices) ==0:
+            is_maiden= True
+
+        min_index = None
+        last_won_at = None
+        if len(win_indices) >0: 
+            min_index = min(win_indices)
+            last_won_at = prev_ratings[min_index]
+
+
+        ##EarlyPacePoints need secs + lbw_post  
+        ##what are qualifying races?
+
+
+        ## utcracetime = local2utc(response.meta['racedate'],response.meta['localtime']),
+        ##TODO internalhorseindex - need racecourse
+        yield items.HorseItem(
+            racedate=response.meta['racedate'],
+            utcracetime = local2utc(response.meta['racedate'],response.meta['localtime']),
+            racecoursecode=response.meta['racecoursecode'],
+            raceclass=try_int(response.meta['raceclass']),
+            racedistance=response.meta['racedistance'],
+            racegoing=response.meta['racegoing'],
+            racesurface=response.meta['racesurface'],
+            racerating=response.meta['racerating'],
+            racename=unicode.strip(response.meta['racename']),
+            racenumber=try_int(response.meta['racenumber']),
+            horsenumber=try_int(response.meta['horsenumber']),
+            horsename=unicode.strip(response.meta['horsename']),
+            horsecode=response.meta['horsecode'],
+            jockeycode=response.meta['jockeycode'],
+            jockeyname=response.meta['jockeyname'],
+            trainercode=response.meta['trainercode'],
+            trainername=response.meta['trainername'],
+            ownername=response.meta['owner'],
+            # totalstakes=cleanpm(unicode.strip(totalstakes)),
+            todaysrating=response.meta['todaysrating'],
+            gear=unicode.strip(response.meta['gear']),
+            lastwonat = get_rating(last_won_at),
+            isMaiden = is_maiden,
+            placing=try_int(response.meta['placing']),
+            finish_time=response.meta['finish_time'],
+            marginsbehindleader=response.meta['marginsbehindleader'],
+            positions=response.meta['positions'],
+            timelist=response.meta['timelist'],
+            priority=removeunicode(response.meta['priority']),
+            seasonstakes=response.meta['seasonstakes']
+        )
+
+    ##BOTH
+    ## each of these HKHC races get parsed  
     def parse_races(self, response):
         #HKJC racecard
         race_paths = response.xpath('//td[@nowrap="nowrap" and @width="24px"]'
@@ -83,19 +370,24 @@ class RaceSpider(scrapy.Spider):
     def parse_results(self, response):
         sectional_time_url = response.xpath('//div[@class="rowDiv15"]/div['
             '@class="rowDivRight"]/a/@href').extract()
-        print sectional_time_url[0]
+        # print sectional_time_url[0]
         try:
             _sectional_time_url = sectional_time_url[0]
         except IndexError:
             assert False
-        request = scrapy.Request(_sectional_time_url, callback=
-            self.parse_sectional_time)
+        if self.historical:
+            request = scrapy.Request(_sectional_time_url, callback=self.parse_sectional_time)
+        else:
+            request = scrapy.Request(response.meta['card_url'], callback=
+            self.parse_race)
         #self.parse_race
         # request = scrapy.Request(response.meta['card_url'], callback=
             # self.parse_race)
+        # yield response
         request.meta.update(response.meta)
         yield request
 
+    ##not historical, not of interest
     def parse_sectional_time(self, response):
 
         horse_lines_selector = response.xpath('//table[@class="bigborder"]//'
@@ -158,6 +450,19 @@ class RaceSpider(scrapy.Spider):
         racename = re.match(r'^Race \d+.{3}(?P<name>.+)$', racename_
             ).groupdict()['name']
 
+        # data only avail from sectionals if historical
+        _marginsbehindleader = None
+        _placing = None
+        _finishtime = None
+        _positions = None
+        _timelist = None
+        if self.historical:
+            _marginsbehindleader = map(horselengthprocessor, sec_time_data['marginsbehindleader'])
+            _placing = get_placing(sec_time_data['placing'])
+            _finishtime = get_sec(sec_time_data['finish_time'])
+            _positions = map(try_int, sec_time_data['positions'])
+            _timelist = sec_time_data['timelist']
+
 
         raceinfo_ = response.xpath('//table[@class="font13 lineH20 tdAlignL"]//descendant::text()[ancestor::td and normalize-space(.) != ""][position()>=2]').extract()
         date_racecourse_localtime = cleanstring(raceinfo_[0])
@@ -189,8 +494,9 @@ class RaceSpider(scrapy.Spider):
             # get_racecoursecode
             distance = unicode.strip(unicode.split(surface_distance, u',')[2].replace('M',''))
             #only if not current race!!
+        going = None
+        if self.historical:
             going = unicode.strip(unicode.split(surface_distance, u',')[3])
-
         racerating = None
         raceclass = None
         if prize_rating_class:
@@ -204,8 +510,7 @@ class RaceSpider(scrapy.Spider):
 
         # pprint.pprint(surface_distance)
         # pprint.pprint(prize_rating_class)
-        # rating = re.match(r'^Rating:\d{2-3}-\d{2-3}(?P<rating>.+).*'), raceinfo_).groupdict()['rating']
-
+        # racerating = re.match(r'^Rating:\d{2-3}-\d{2-3}(?P<rating>.+).*', raceinfo_).groupdict()['rating']
         ### RaceCategory RACETIME SURFACE DISTANCE GOING 
         ### PM RATING CLASS  
         ##season_stakes and priority
@@ -214,7 +519,9 @@ class RaceSpider(scrapy.Spider):
 
             horsenumber = tr.xpath('td[1]/text()').extract()[0]
             horsename = tr.xpath('td[4]/a/text()').extract()[0]
-
+            horse_path = tr.xpath('td[4]/a/@href').extract()[0]
+            horse_url = 'http://www.{domain}/english/racing/{path}&Option=1#htop'.format(
+                domain=self.domain, path=horse_path)
             horsecode_ = tr.xpath('td[4]/a/@href').extract()[0]
             horsecode = re.match(r"^[^\?]+\?horseno=(?P<code>\w+)'.*$",
                 horsecode_).groupdict()['code']
@@ -260,6 +567,7 @@ class RaceSpider(scrapy.Spider):
                 horsenumber=try_int(horsenumber),
                 horsename=horsename,
                 horsecode=horsecode,
+                horse_url= horse_url,
                 jockeycode=jockeycode,
                 jockeyname=re.sub(r'\([^)]*\)', '', jockeyname_),
                 trainercode=trainercode,
@@ -268,11 +576,11 @@ class RaceSpider(scrapy.Spider):
                 owner=owner_,
                 gear=gear_,
                 draw=try_int(draw_),
-                placing=get_placing(sec_time_data['placing']),
-                finish_time=get_sec(sec_time_data['finish_time']),
-                marginsbehindleader=map(horselengthprocessor, sec_time_data['marginsbehindleader']),
-                positions=map(try_int, sec_time_data['positions']),
-                timelist=sec_time_data['timelist'], #test get_sec
+                placing=_placing,
+                finish_time=_finishtime,
+                marginsbehindleader=_marginsbehindleader,
+                positions=_positions,
+                timelist=_timelist, #test get_sec
                 seasonstakes = try_int(seasonstakes_),
                 priority = get_priority(priority_)
             )
@@ -336,8 +644,7 @@ class RaceSpider(scrapy.Spider):
         ##what are qualifying races?
 
 
-
-        ## utcracetime = local2utc(response.meta['racedate'],response.meta['localtime']),
+        
         ##TODO internalhorseindex - need racecourse
         yield items.HorseItem(
             racedate=response.meta['racedate'],
@@ -440,10 +747,7 @@ class RaceSpider(scrapy.Spider):
         
         new_tips = {}
         for k,v in tips.items():
-            if k == u"Shannon (vincent Wong)":
-                newk = u"Shannon"
-            else:
-                newk = k
+            newk = k
             tips_value_dict = {}
             vals = v.split(u' ')
             vals = [v for v in vals if v != u'']
@@ -464,6 +768,7 @@ class RaceSpider(scrapy.Spider):
                 '//tr[@bgcolor="white"]/td[4]//a/text()').extract():
 
             request = scrapy.Request(comments_url, callback=self.parse_comments)
+
             request.meta.update(response.meta)
             request.meta.update(tips=new_tips)
             request.meta.update(naps=naps)
@@ -539,6 +844,7 @@ class RaceSpider(scrapy.Spider):
         best_url = 'http://racing.scmp.com/statistic_chart/bestfinish{}.asp'
         request = scrapy.Request(best_url.format(response.meta['racenumber']),
             callback=self.parse_best)
+
         request.meta.update(response.meta)
         request.meta.update(racenumber=response.meta['racenumber'])
         request.meta.update(totaljump=totaljump)

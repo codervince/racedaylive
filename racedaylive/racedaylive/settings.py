@@ -11,9 +11,10 @@ from datetime import datetime
 
 BOT_NAME = 'racedaylive'
 
-ITEMS_PIPELINES = {
+ITEM_PIPELINES = {
 	
-	"RacedaylivePipeline":1
+	"racedaylive.pipelines.RacedaylivePipeline":100,
+	# "racedaylive.pipeline2.SQLAlchemyPipeline":50
 }
 
 SPIDER_MODULES = ['racedaylive.spiders']
@@ -33,3 +34,12 @@ AUTOTHROTTLE_ENABLED = True
 SCMP_USER = 'luckyvince'
 SCMP_PASSWORD = 'invader'
 
+#LOCALHOST
+DATABASE = {
+    'drivername': 'postgres',
+    'host': 'localhost',
+    'port': '5432',
+    'username': 'vmac',
+    'password': '',
+    'database': 'hkraces_aug15'
+}

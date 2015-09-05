@@ -1,3 +1,349 @@
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import sessionmaker, scoped_session,exc, create_session
+from sqlalchemy.sql.expression import ClauseElement
+from sqlalchemy import *
+from sqlalchemy.engine.url import URL
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
+from sqlalchemy import create_engine
+import settings
+import items
+from collections import *
+# from racedaylive.items import *
+from racedaylive.models import *
+'''
+HorseItem
+
+Raceday racedate, racecoursecode, runnerslist self.code_set
+Race raceday_id
+            racedate=response.meta['racedate'],
+            utcracetime = local2utc(response.meta['racedate'],response.meta['localtime']),
+            racecoursecode=response.meta['racecoursecode'],
+            raceclass=try_int(response.meta['raceclass']),
+            racedistance=response.meta['racedistance'],
+            racegoing=response.meta['racegoing'],
+            racesurface=response.meta['racesurface'],
+            racerating=response.meta['racerating'],
+            racename=unicode.strip(response.meta['racename']),
+            racenumber=try_int(response.meta['racenumber']),
+            horsenumber=try_int(response.meta['horsenumber']),
+            horsename=unicode.strip(response.meta['horsename']),
+            horsecode=response.meta['horsecode'],
+            jockeycode=response.meta['jockeycode'],
+            jockeyname=response.meta['jockeyname'],
+            trainercode=response.meta['trainercode'],
+            trainername=response.meta['trainername'],
+            ownername=response.meta['owner'],
+            # totalstakes=cleanpm(unicode.strip(totalstakes)),
+            todaysrating=response.meta['todaysrating'],
+            gear=unicode.strip(response.meta['gear']),
+            lastwonat = get_rating(last_won_at),
+            isMaiden = is_maiden,
+            placing=try_int(response.meta['placing']),
+            finish_time=response.meta['finish_time'],
+            marginsbehindleader=response.meta['marginsbehindleader'],
+            positions=response.meta['positions'],
+            timelist=response.meta['timelist'],
+            priority=removeunicode(response.meta['priority']),
+            seasonstakes=response.meta['seasonstakes']
+
+
+'''
+
+def get_or_create_pl(model, indexfields, **kwargs):
+    '''
+    indexfields should be a dict of the uniqur fields for lookup
+    '''
+    session = Session()
+    query = session.query(model).filter_by(**indexfields)
+    instance = query.first()
+    created = False
+    if not instance:
+        params = dict(
+            (k, v) for k, v in kwargs.iteritems()
+            if not isinstance(v, ClauseElement))
+        params.update(defaults)
+        instance = model(**params)
+
+        try:
+            session.add(instance)
+            session.commit()
+            created = True
+        except IntegrityError:
+            session.rollback()
+            instance = query.one()
+            created = False
+        except Exception:
+            session.close()
+            raise
+
+    session.refresh(instance)  # Refreshing before session close
+    session.close()
+    return instance
+
+# def get_or_create(model, defaults=None, **kwargs):
+#     ''' 
+#     needs to be able to do LOOKUP BASED ON THE UNIQUE INDEX
+#     Short get or create implementation. Like in Django.
+#     This can run within the read_pool
+#     We don't use write scheduling here, because of very low amount of writes.
+#     Optimization unneeded, as I think.
+#     We use this function to prevent IntegrityError messages.
+#     '''
+
+#     defaults = defaults or {}
+
+#     session = Session()  # I'm thread safe =)
+
+#     query = session.query(model).filter_by(**kwargs)
+
+#     instance = query.first()
+
+#     created = False
+
+#     if not instance:
+#         params = dict(
+#             (k, v) for k, v in kwargs.iteritems()
+#             if not isinstance(v, ClauseElement))
+#         params.update(defaults)
+#         instance = model(**params)
+
+#         try:
+#             session.add(instance)
+#             session.commit()
+#             created = True
+#         except IntegrityError:
+#             session.rollback()
+#             instance = query.one()
+#             created = False
+#         except Exception:
+#             session.close()
+#             raise
+
+#     session.refresh(instance)  # Refreshing before session close
+#     session.close()
+#     return instance, created
+
+class RacedaylivePipeline(object):
+
+    def __init__(self):
+        Base = automap_base()
+        engine = create_engine(URL(**settings.DATABASE))
+        # create_tables(engine)    
+        Base.prepare(engine, reflect=True)
+
+        Raceday = Base.classes.raceday
+        Race = Base.classes.race
+        Runner = Base.classes.runner
+        Owner = Base.classes.owner
+        Trainer = Base.classes.trainer
+        Jockey = Base.classes.jockey
+        Horse = Base.classes.horse
+
+        self.Session = sessionmaker(bind=engine)
+        self.cache = defaultdict(lambda: defaultdict(lambda: None)) #necessary?
+        session = create_session(bind=engine)
+        
+        testlist = session.query(Raceday).all()     
+        for test in testlist:  
+            print test.racedate
+
+    # write to rd_race
+    def process_item(self, item, spider):
+        session = self.Session()
+        #which item?
+        # if isinstance(item, HorseItem):
+            # iscreated = False
+        '''
+        horsenumber = db.Column(db.Integer)
+	    todaysrating = db.Column(db.Integer)
+	    lastwonat= db.Column(db.Integer)
+	    isMaiden = db.Column(db.Boolean)
+	    seasonstakes =db.Column(db.Float)
+	    draw = db.Column(db.Integer)
+	    isScratched = db.Column(db.Boolean)
+	    priority = db.Column(db.String(100))
+	    gear = db.Column(db.String(20))
+        '''
+        #creating runner object nested
+        #or dictionary
+
+        #get racedays
+        raceday_id = get_or_create_pl(
+                Raceday,{racedate:item.get("racedate", None),racecoursecode:item.get("racecoursecode", None)}  ,
+                    racedate= item.get("racedate", None),
+                    racecoursecode= item.get("RacecourseCode", None),
+                    runnerslist=RaceSpider.code_set
+                   )
+        print raceday_id
+        return item
+   #          runner = Runner(
+
+   #          race_id = get_or_create_pl(
+   #          	Race,
+   #          	{raceday_id: get_or_create_pl(Raceday,{racedate:item.get("racedate", None),\
+   #           racecoursecode:item.get("racecoursecode", None)},\
+   #          	racedate=item.get("racedate", None), racecoursecode=item.get("racecoursecode", None),\
+   #          	runnerslist=self.code_set,racenumber:item.get("racenumber", None)).id,racenumber = item.get("racenumber", None)},
+   #          	racenumber= item.get("racenumber", None)
+			# 	racename = item.get("racename", None)
+			# 	raceclass = item.get("raceclass", None)
+			# 	racerating = item.get("racerating", None)
+			# 	racegoing = item.get("racegoing", None)
+			# 	racesurface = item.get("racesurface", None)
+			# 	racedistance = item.get("racedistance", None)
+			# 	utcracetime = item.get("utcracetime", None)
+			# 	norunners = len(self.runners_list[racenumber]),
+			# 	raceday_id = get_or_create_pl(Raceday,{racedate:item.get("racedate", None),\
+   #           racecoursecode:item.get("racecoursecode", None)},\
+   #          	racedate=item.get("racedate", None), racecoursecode=item.get("racecoursecode", None),\
+   #          	runnerslist=self.code_set,racenumber:item.get("racenumber", None)).id
+			# 	),
+			# 	#end race 
+   #          horse_id= get_or_create_pl(Horse,\
+   #          	{code:item.get("code", None)},\
+   #          	name=item.get("name", None), 
+   #      	code=item.get("code", None)).id,
+
+   #          trainer_id = get_or_create_pl(Trainer,{code:item.get("code", None)},
+   #      	name=item.get("name", None), 
+   #      	code=item.get("code", None)).id,
+
+   #          jockey_id = get_or_create_pl(Jockey,{code:item.get("code", None)},
+   #      	name=item.get("name", None), 
+   #      	code=item.get("code", None)).id,
+
+   #          owner_id = get_or_create_pl(Owner,{code:item.get("name", None)},
+			# horsenumber = item.get("horsenumber", None)
+			# todaysrating = item.get("todaysrating", None)
+			# lastwonat= item.get("lastwonat", None)
+			# isMaiden = item.get("isMaiden", None)
+			# seasonstakes =item.get("seasonstakes", None)
+			# draw = item.get("draw", None)
+			# isScratched = item.get("isScratched", None)
+			# priority = item.get("priority", None)
+			# gear = item.get("gear", None)
+   #      	)
+
+   #          	print raceday_id, horse_id
+   #          	# yield raceday_id
+   #          assert owner_id is not None
+   #          # return item
+        # else:
+        # 	pass
+        # try:
+        #     # session.add(races)
+        #     # session.add(runners)
+        #     # session.commit()
+        # except:
+        #     # session.rollback()
+        #     raise
+        # finally:
+        #     # session.close()
+
+            # return
+
+
+
+
+
+
+            ##do RACE
+'''
+RA
+racenumber = db.Column(db.Integer)
+racename = db.Column(db.String(150))
+raceclass = db.Column(db.String(50))
+racerating = db.Column(db.String(50))
+racegoing = db.Column(db.String(10)) #GF GY Y 
+racesurface = db.Column(db.String(15)) #AWT or B+3
+racedistance = db.Column(Integer) # 1000
+utcracetime = db.Column(db.TIMESTAMP()) #exact jump time updatable
+norunners = db.Column(db.Integer)
+'''
+            # raceid,iscreated = get_or_create(Race,
+            # 	racenumber=item.get("racenumber", None),
+            # 	racename=item.get("racename", None),
+            # 	raceclass=item.get("raceclass", None),
+            # 	racegoing=item.get("racegoing", None),
+            # 	racesurface=item.get("racesurface", None),
+            # 	racedistance=item.get("racedistance", None),
+            # 	utcracetime=item.get("utcracetime", None),
+            # 	norunners=len(self.runners_list[racenumber]),
+            # 	raceday_id= raceday_id
+            # 	)
+            # yield raceid
+'''
+RU 
+horsenumber = db.Column(db.Integer)
+todaysrating = db.Column(db.Integer)
+lastwonat= db.Column(db.Integer)
+isMaiden = db.Column(db.Boolean)
+seasonstakes =db.Column(db.Float)
+draw = db.Column(db.Integer)
+isScratched = db.Column(db.Boolean)
+priority = db.Column(db.String(100))
+gear = db.Column(db.String(20))
+'''
+        #    horseid = get_or_create(
+        #     Horse, 
+        #         "Name": item["Horsename"],
+        #         "Code": item["Horsecode"],
+        #         "SireName": item["SireName"],
+        #         "DamName": item["DamName"],
+        #         "ImportType": item["ImportType"],
+        #         "Sex": item["Sex"],
+        #         "Homecountry": 'HKG',
+        #         "YearofBirth": item["LocalRaceDateTime"].replace(item["LocalRaceDateTime"].year - item.get("Age",0)).year
+        #     })
+
+        # jockeyid = self.scheduler.get_id(
+        #     Jockey, "Name",
+        #     {
+        #         "Name": item["Jockeyname"],
+        #         "Code": item["Jockeycode"],
+        #         "Homecountry": 'HKG'
+        #     })
+
+
+        # trainerid = self.scheduler.get_id(
+        #     Trainer, "Name",
+        #     {
+        #         "Name": item["Trainername"],
+        #         "Code": item["Trainercode"],
+        #         "Homecountry": 'HKG'
+
+        #     })
+
+        # ownerid = self.scheduler.get_id(
+        #     Owner, "Name",
+        #     {   "Name": item["Owner"]   
+
+        #     })
+
+            # horse, jockey, trainer, owner
+            
+        # print 
+        # racedays = RPRacedaydump(
+
+        #             racename = item.get("racename", None),
+        #             racedate= item.get("racedate",None),
+        #             racecoursecode= item.get("racecourse",None),
+        #             Racetime= item.get("racetime",None),
+        #             Racepm= item.get("racepm", None),
+   					# ...
+        #         )
+        # try:
+        # # session.add(races)
+        #     session.add(racedays)
+        #     session.commit()
+        # except:
+        #     session.rollback()
+        #     raise
+        # finally:
+        #     session.close()
+        
+
 # # -*- coding: utf-8 -*-
 
 # # Define your item pipelines here
@@ -689,7 +1035,7 @@
 
 #         returnValue(item)
 
-# # class RpostPipeline(object):
+# class RpostPipeline(object):
 
 # #     def __init__(self): 
 # #         engine = create_engine(URL(**settings.DATABASE))

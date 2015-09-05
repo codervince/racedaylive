@@ -26,6 +26,7 @@ class HorseItem(scrapy.Item):
     horsename = scrapy.Field() #to rdhorse and id to rd_runner
     horsenumber = scrapy.Field() #to rdhorse
     horsecode = scrapy.Field() #to rdhorse
+    horse_url= scrapy.Field()
     jockeycode = scrapy.Field()
     jockeyname = scrapy.Field()
     trainercode = scrapy.Field()
