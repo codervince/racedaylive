@@ -8,6 +8,18 @@ Install: . bootstrap.sh
 Start spider: cd racedaylive ../env/bin/scrapy crawl race -a racedate=20150513 -a coursecode=HV -a historical=0 (or 1)
 
 
+##TODO
+
+## PIPELINE
+* reflects existing tables - no new table creation
+* updates RD -> RA --> H J T O RU
+
+* Upon entry storedwrite stats to extendedraceday table
+
+## SCRAPY 
+* deploy to cloud and run periodically
+
+
 #TODO
 
 1 GITHUB update
