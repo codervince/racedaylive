@@ -11,6 +11,7 @@ import items
 from collections import *
 # from racedaylive.items import *
 from racedaylive.models import *
+from racedaylive import models
 '''
 HorseItem
 
@@ -50,11 +51,13 @@ Race raceday_id
 
 '''
 
+ENGINE = models.get_engine()
+
 def get_or_create_pl(model, indexfields, **kwargs):
     '''
     indexfields should be a dict of the uniqur fields for lookup
     '''
-    session = Session()
+    session = Session(bind=ENGINE)
     query = session.query(model).filter_by(**indexfields)
     instance = query.first()
     created = False
@@ -62,7 +65,7 @@ def get_or_create_pl(model, indexfields, **kwargs):
         params = dict(
             (k, v) for k, v in kwargs.iteritems()
             if not isinstance(v, ClauseElement))
-        params.update(defaults)
+        #params.update(defaults)
         instance = model(**params)
 
         try:
@@ -123,6 +126,39 @@ def get_or_create_pl(model, indexfields, **kwargs):
 #     session.refresh(instance)  # Refreshing before session close
 #     session.close()
 #     return instance, created
+
+class RacedaylivePipelineHorseItem(object):
+
+    def process_item(self, item, spider):
+
+        if not isinstance(item, items.HorseItem):
+            return
+
+        get_params = lambda model, item: {c.name: item[c.name] 
+            for c in model.__table__.columns if c.name != 'id'}
+        get_unique = lambda model, item: {c.name: item[c.name] 
+            for c in model.__table__.columns if c.name != 'id' and getattr(c, 'unique')}
+
+        owner_unique = get_unique(models.Owner, item)
+        owner_params = get_params(models.Owner, item)
+        owner = get_or_create_pl(models.Owner, owner_unique, **owner_params)
+        print owner
+
+        horse_unique = get_unique(models.Horse, item)
+        horse_params = get_params(models.Horse, item)
+        horse = get_or_create_pl(models.Horse, horse_unique, **horse_params)
+        print horse
+
+        trainer_unique = get_unique(models.Trainer, item)
+        trainer_params = get_params(models.Trainer, item)
+        trainer = get_or_create_pl(models.Trainer, trainer_unique, **trainer_params)
+        print trainer
+
+        jockey_unique = get_unique(models.Jockey, item)
+        jockey_params = get_params(models.Jockey, item)
+        jockey = get_or_create_pl(models.Jockey, jockey_unique, **jockey_params)
+        print jockey
+
 
 class RacedaylivePipeline(object):
 

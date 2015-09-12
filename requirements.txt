@@ -6,3 +6,5 @@ cssselect==0.9.1
 pyOpenSSL==0.14
 service_identity
 python-dateutil
+SQLAlchemy==1.0.8
+psycopg2

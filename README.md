@@ -5,6 +5,9 @@ gets raceday information HK
 
 Install: . bootstrap.sh
 
+docker run --name raceday-postgres -v $PWD/db:/var/lib/postgresql/data -p 5432:5432 -e POSTGRES_PASSWORD='' -e POSTGRES_USER=vmac -d postgres
+docker run -it --link raceday-postgres:postgres --rm postgres sh -c 'exec psql -h "$POSTGRES_PORT_5432_TCP_ADDR" -p "$POSTGRES_PORT_5432_TCP_PORT" -U vmac -d hkraces_aug15'
+
 Start spider: cd racedaylive ../env/bin/scrapy crawl race -a racedate=20150513 -a coursecode=HV -a historical=0 (or 1)
 
 

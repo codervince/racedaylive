@@ -1,0 +1,2 @@
+DROP DATABASE hkraces_aug15;
+CREATE DATABASE hkraces_aug15 OWNER vmac;

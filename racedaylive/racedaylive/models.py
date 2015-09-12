@@ -1,8 +1,12 @@
-from sqlalchemy import *
+from sqlalchemy import Column, BigInteger, String, Integer, UniqueConstraint, Date,\
+    TIMESTAMP, Float, ForeignKey, Boolean
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session, sessionmaker, scoped_session, create_session
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session, sessionmaker, scoped_session, create_session,\
+    relationship, backref
 from sqlalchemy import create_engine
+from sqlalchemy.dialects import postgresql
 import settings
 
 def get_engine():
@@ -77,195 +81,198 @@ def create_schema(engine):
 # #         self.DateSignedUp = DateSignedUp
 # #         self.Animal = Animal
 
-# ##RACEDAY TABLES
-# class Owner(db.Model):
-#     __tablename__ = "owner"
-#     id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
-#     name = Column("name", String(255), nullable=False)
-#     __table_args__ = (UniqueConstraint('name'),)
+Base = declarative_base()
+
+##RACEDAY TABLES
+class Owner(Base):
+    __tablename__ = "owner"
+    id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
+    ownername = Column("ownername", String(255), nullable=False, unique=True)
+    __table_args__ = (UniqueConstraint('ownername'),)
 #     def __init__(self, ownername):
 #         self.name= ownername
-  
-# class Horse(db.Model):
-#     __tablename__ = "horse"
-#     id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
-#     name = Column("horsename", String(255), nullable=False)
-#     code = Column("horsecode", String(6), nullable=False, unique=True)
-#     __table_args__ = (UniqueConstraint('horsecode'),)
+
+class Horse(Base):
+    __tablename__ = "horse"
+    id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
+    horsename = Column("horsename", String(255), nullable=False)
+    horsecode = Column("horsecode", String(6), nullable=False, unique=True)
+    __table_args__ = (UniqueConstraint('horsecode'),)
 #     def __init__(self, horsename, horsecode):
 #         self.horsename= horsename
 #         self.horsecode = horsecode
 
-# class Trainer(db.Model):
-#     __tablename__ = "trainer"
-#     id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
-#     name = Column("trainername", String(255), nullable=False)
-#     code = Column("trainercode", String(6), nullable=False, unique=True)
-#     __table_args__ = (UniqueConstraint('trainercode'),)
+class Trainer(Base):
+    __tablename__ = "trainer"
+    id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
+    trainername = Column("trainername", String(255), nullable=False)
+    trainercode = Column("trainercode", String(6), nullable=False, unique=True)
+    __table_args__ = (UniqueConstraint('trainercode'),)
 #     def __init__(self, trainername, trainercode):
 #         self.name= trainername
 #         self.code = trainercode
 
-# class Jockey(db.Model):
-#     __tablename__ = "jockey"
-#     id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
-#     name = Column("jockeyname", String(255), nullable=False)
-#     code = Column("jockeycode", String(6), nullable=False, unique=True)
-#     __table_args__ = (UniqueConstraint('jockeycode'),)
+class Jockey(Base):
+    __tablename__ = "jockey"
+    id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
+    jockeyname = Column("jockeyname", String(255), nullable=False)
+    jockeycode = Column("jockeycode", String(6), nullable=False, unique=True)
+    __table_args__ = (UniqueConstraint('jockeycode'),)
 #     def __init__(self, jockeyname, jockeycode):
 #         self.name= jockeyname
 #         self.code = jockeycode
 
 
-# class Raceday(db.Model):
-#     __tablename__ = "raceday"
-#     id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
-#     racedate = Column(db.Date, nullable=False)
-#     racecoursecode = db.Column(db.String(2))
-#     runners_list = db.Column(postgresql.ARRAY(String(5))) #skips race
+class Raceday(Base):
+    __tablename__ = "raceday"
+    id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
+    racedate = Column(Date, nullable=False)
+    racecoursecode = Column(String(2))
+    runners_list = Column(postgresql.ARRAY(String(5))) #skips race
 
-#     __table_args__ = (UniqueConstraint('racedate', 'racecoursecode'),)
+    __table_args__ = (UniqueConstraint('racedate', 'racecoursecode'),)
 #     def __init__(self, racedate, racecoursecode, runners_list):
 #         self.racedate= racedate
 #         self.racecoursecode = racecoursecode
 #         self.runners_list = runners_list
 
-# class Race(db.Model):
-#     __tablename__ = "race"
-#     id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
-#     racenumber = db.Column(db.Integer)
-#     racename = db.Column(db.String(150))
-#     raceclass = db.Column(db.String(50))
-#     racerating = db.Column(db.String(50))
-#     racegoing = db.Column(db.String(10)) #GF GY Y 
-#     racesurface = db.Column(db.String(15)) #AWT or B+3
-#     racedistance = db.Column(Integer) # 1000
-#     utcracetime = db.Column(db.TIMESTAMP()) #exact jump time updatable
-#     marketorder = db.Column(db.String(15))
-#     result = db.Column(db.String(15))
-#     winodds = db.Column(db.Float)
-#     favpos = db.Column(db.Integer)
-#     favodds = db.Column(db.Float)
-#     norunners = db.Column(db.Integer)
-#     f4 = db.Column(postgresql.ARRAY(Float))
-#     tierce= db.Column(postgresql.ARRAY(Float))
-#     qtt = db.Column(postgresql.ARRAY(Float))
-#     dt = db.Column(postgresql.ARRAY(Float))
-#     tt = db.Column(postgresql.ARRAY(Float))
-#     ttc = db.Column(postgresql.ARRAY(Float))
-#     sixup = db.Column(postgresql.ARRAY(Float))
-#     sixupc = db.Column(postgresql.ARRAY(Float))
-#     raceday_id = db.Column(db.Integer, ForeignKey('raceday.id'))
+class Race(Base):
+    __tablename__ = "race"
+    id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
+    racenumber = Column(Integer)
+    racename = Column(String(150))
+    raceclass = Column(String(50))
+    racerating = Column(String(50))
+    racegoing = Column(String(10)) #GF GY Y 
+    racesurface = Column(String(15)) #AWT or B+3
+    racedistance = Column(Integer) # 1000
+    utcracetime = Column(TIMESTAMP()) #exact jump time updatable
+    marketorder = Column(String(15))
+    result = Column(String(15))
+    winodds = Column(Float)
+    favpos = Column(Integer)
+    favodds = Column(Float)
+    norunners = Column(Integer)
+    f4 = Column(postgresql.ARRAY(Float))
+    tierce= Column(postgresql.ARRAY(Float))
+    qtt = Column(postgresql.ARRAY(Float))
+    dt = Column(postgresql.ARRAY(Float))
+    tt = Column(postgresql.ARRAY(Float))
+    ttc = Column(postgresql.ARRAY(Float))
+    sixup = Column(postgresql.ARRAY(Float))
+    sixupc = Column(postgresql.ARRAY(Float))
+    raceday_id = Column(Integer, ForeignKey('raceday.id'))
 
-#     raceday = relationship("Raceday", 
-#         backref=db.backref('races', lazy='dynamic'))
-#     __table_args__ = (UniqueConstraint('raceday_id', 'racenumber'),)
+    raceday = relationship("Raceday", 
+        backref=backref('races', lazy='dynamic'))
+    __table_args__ = (UniqueConstraint('raceday_id', 'racenumber'),)
     
-#     def __init__(self, racedate, racecoursecode, racenumber, racename, raceclass, racerating, racegoing,racesurface, racedistance, utcracetime,
-#         marketorder, result, winodds, favpos, favodds, norunners, f4, tierce, qtt, dt, tt, ttc, sixup, sixupc
-#         ):
-#         self.racedate = racedate
-#         self.racecoursecode = racecoursecode
-#         self.racenumber = racenumber
-#         self.racename = racename
-#         self.raceclass = raceclass
-#         self.racerating = racerating
-#         self.racegoing = racegoing
-#         self.racesurface = racesurface
-#         self.racedistance = racedistance
-#         self.utcracetime = utcracetime
-#         self.marketorder = marketorder
-#         self.result= result
-#         self.winodds = winodds
-#         self.favpos = favpos
-#         self.favodds = favodds
-#         self.norunners = norunners
-#         self.f4 = f4
-#         self.tierce = tierce
-#         self.qtt = qtt
-#         self.dt = dt
-#         self.tt  = tt
-#         self.ttc = ttc
-#         self.sixup = sixup
-#         self.sixupc = sixupc
+    def __init__(self, racedate, racecoursecode, racenumber, racename, raceclass, racerating, racegoing,racesurface, racedistance, utcracetime,
+        marketorder, result, winodds, favpos, favodds, norunners, f4, tierce, qtt, dt, tt, ttc, sixup, sixupc
+        ):
+        self.racedate = racedate
+        self.racecoursecode = racecoursecode
+        self.racenumber = racenumber
+        self.racename = racename
+        self.raceclass = raceclass
+        self.racerating = racerating
+        self.racegoing = racegoing
+        self.racesurface = racesurface
+        self.racedistance = racedistance
+        self.utcracetime = utcracetime
+        self.marketorder = marketorder
+        self.result= result
+        self.winodds = winodds
+        self.favpos = favpos
+        self.favodds = favodds
+        self.norunners = norunners
+        self.f4 = f4
+        self.tierce = tierce
+        self.qtt = qtt
+        self.dt = dt
+        self.tt  = tt
+        self.ttc = ttc
+        self.sixup = sixup
+        self.sixupc = sixupc
   
-#   ##results go in r_runner same index
-# class Runner(db.Model):
-#     __tablename__ = "runner"
-#     id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
-#     horsenumber = db.Column(db.Integer)
-#     todaysrating = db.Column(db.Integer)
-#     lastwonat= db.Column(db.Integer)
-#     isMaiden = db.Column(db.Boolean)
-#     seasonstakes =db.Column(db.Float)
-#     draw = db.Column(db.Integer)
-#     isScratched = db.Column(db.Boolean)
-#     priority = db.Column(db.String(100))
-#     gear = db.Column(db.String(20))
-#     placing= db.Column(db.Integer)
-#     finish_time = db.Column(db.Float) #seconds
-#     marginsbehindleader = db.Column(postgresql.ARRAY(Float)) #floats
-#     positions = db.Column(postgresql.ARRAY(Integer)) #ints
-#     timelist= db.Column(postgresql.ARRAY(Float))
-#     scmp_runner_comment = db.Column(db.String(256))
-#     barriertimes = db.Column(postgresql.ARRAY(String(100)))
-#     jumptimes = db.Column(postgresql.ARRAY(String(100)))
-#     totalbarrier = db.Column(postgresql.ARRAY(Integer)) 
-#     totalcanter =db.Column(postgresql.ARRAY(Integer)) 
-#     totaljump = db.Column(postgresql.ARRAY(Integer)) 
-#     totalswim = db.Column(postgresql.ARRAY(Integer)) 
-#     owner_id = db.Column(db.Integer, ForeignKey('owner.id'))
-#     owner = relationship("Owner", 
-#         backref=db.backref('runners', lazy='dynamic'))
+  ##results go in r_runner same index
+class Runner(Base):
+    __tablename__ = "runner"
+    id = Column(BigInteger, primary_key = True, autoincrement = True, nullable = False) 
+    horsenumber = Column(Integer)
+    todaysrating = Column(Integer)
+    lastwonat= Column(Integer)
+    isMaiden = Column(Boolean)
+    seasonstakes =Column(Float)
+    draw = Column(Integer)
+    isScratched = Column(Boolean)
+    priority = Column(String(100))
+    gear = Column(String(20))
+    placing= Column(Integer)
+    finish_time = Column(Float) #seconds
+    marginsbehindleader = Column(postgresql.ARRAY(Float)) #floats
+    positions = Column(postgresql.ARRAY(Integer)) #ints
+    timelist= Column(postgresql.ARRAY(Float))
+    scmp_runner_comment = Column(String(256))
+    barriertimes = Column(postgresql.ARRAY(String(100)))
+    jumptimes = Column(postgresql.ARRAY(String(100)))
+    totalbarrier = Column(postgresql.ARRAY(Integer)) 
+    totalcanter =Column(postgresql.ARRAY(Integer)) 
+    totaljump = Column(postgresql.ARRAY(Integer)) 
+    totalswim = Column(postgresql.ARRAY(Integer)) 
+    owner_id = Column(Integer, ForeignKey('owner.id'))
+    owner = relationship("Owner", 
+        backref=backref('runners', lazy='dynamic'))
 
-#     jockey_id = db.Column(db.Integer, ForeignKey('jockey.id'))
-#     jockey = relationship("Jockey", 
-#         backref=db.backref('runners', lazy='dynamic'))
+    jockey_id = Column(Integer, ForeignKey('jockey.id'))
+    jockey = relationship("Jockey", 
+        backref=backref('runners', lazy='dynamic'))
 
-#     trainer_id = db.Column(db.Integer, ForeignKey('trainer.id'))
-#     trainer = relationship("Trainer", 
-#         backref=db.backref('runners', lazy='dynamic'))
+    trainer_id = Column(Integer, ForeignKey('trainer.id'))
+    trainer = relationship("Trainer", 
+        backref=backref('runners', lazy='dynamic'))
 
-#     horse_id = db.Column(db.Integer, ForeignKey('owner.id'))
-#     horse = relationship("Horse", 
-#         backref=db.backref('runners', lazy='dynamic'))
+    horse_id = Column(Integer, ForeignKey('horse.id'))
+    horse = relationship("Horse", 
+        backref=backref('runners', lazy='dynamic'))
 
-#     race_id = db.Column(db.Integer, ForeignKey('race.id'))
-#     race = relationship("Race", 
-#         backref=db.backref('runners', lazy='dynamic'))
+    race_id = Column(Integer, ForeignKey('race.id'))
+    race = relationship("Race", 
+        backref=backref('runners', lazy='dynamic'))
 
-#     __table_args__ = (UniqueConstraint('race_id', 'horse_id'),)
+    __table_args__ = (UniqueConstraint('race_id', 'horse_id'),)
 
-#     def __init__(self, race_id, horsenumber, horse_id, jockey_id, trainer_id, owner_id,
-#         todaysrating, lastwonat, isMaiden, seasonstakes, draw, priority, gear,placing, finish_time,
-#         marginsbehindleader, positions, timelist,scmp_runner_comment, barriertimes, jumptimes,totalbarrier, totaljump, totalswim, isScratched=False,):
-#         self.race_id = race_id
-#         self.horsenumber = horsenumber
-#         self.horse_id = horse_id
-#         self.trainer_id = trainer_id
-#         self.jockey_id = jockey_id
-#         self.owner_id = owner_id
+    def __init__(self, race_id, horsenumber, horse_id, jockey_id, trainer_id, owner_id,
+        todaysrating, lastwonat, isMaiden, seasonstakes, draw, priority, gear,placing, finish_time,
+        marginsbehindleader, positions, timelist,scmp_runner_comment, barriertimes, 
+        jumptimes,totalbarrier, totalcanter, totaljump, totalswim, isScratched=False,):
+        self.race_id = race_id
+        self.horsenumber = horsenumber
+        self.horse_id = horse_id
+        self.trainer_id = trainer_id
+        self.jockey_id = jockey_id
+        self.owner_id = owner_id
     
-#         self.todaysrating = todaysrating
-#         self.lastwonat= lastwonat
-#         self.isMaiden = isMaiden
-#         self.seasonstakes = seasonstakes
-#         self.draw= draw
-#         self.isScratched = isScratched
-#         self.priority = priority
-#         self.gear = gear
-#         self.placing = placing
-#         self.finish_time = finish_time
-#         self.marginsbehindleader = marginsbehindleader
-#         self.positions = positions
-#         self.timelist = timelist
-#         self.scmp_runner_comment = scmp_runner_comment
-#         self.barriertimes = barriertimes
-#         self.jumptimes = jumptimes
-#         self.totalbarrier = totalbarrier
-#         self.totalcanter = totalcanter
-#         self.totaljump = totaljump
-#         self.totalswim =totalswim 
+        self.todaysrating = todaysrating
+        self.lastwonat= lastwonat
+        self.isMaiden = isMaiden
+        self.seasonstakes = seasonstakes
+        self.draw= draw
+        self.isScratched = isScratched
+        self.priority = priority
+        self.gear = gear
+        self.placing = placing
+        self.finish_time = finish_time
+        self.marginsbehindleader = marginsbehindleader
+        self.positions = positions
+        self.timelist = timelist
+        self.scmp_runner_comment = scmp_runner_comment
+        self.barriertimes = barriertimes
+        self.jumptimes = jumptimes
+        self.totalbarrier = totalbarrier
+        self.totalcanter = totalcanter
+        self.totaljump = totaljump
+        self.totalswim =totalswim 
 
 # ### tipster
 # class t_System(db.Model):

@@ -13,7 +13,7 @@ BOT_NAME = 'racedaylive'
 
 ITEM_PIPELINES = {
 	
-	"racedaylive.pipelines.RacedaylivePipeline":100,
+	"racedaylive.pipelines.RacedaylivePipelineHorseItem":100,
 	# "racedaylive.pipeline2.SQLAlchemyPipeline":50
 }
 
