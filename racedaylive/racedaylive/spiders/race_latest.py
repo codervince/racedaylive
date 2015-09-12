@@ -341,7 +341,8 @@ class RaceSpider(scrapy.Spider):
             positions=response.meta['positions'],
             timelist=response.meta['timelist'],
             priority=removeunicode(response.meta['priority']),
-            seasonstakes=response.meta['seasonstakes']
+            seasonstakes=response.meta['seasonstakes'],
+            runners_list=self.runners_list,
         )
 
     ##BOTH
@@ -676,7 +677,8 @@ class RaceSpider(scrapy.Spider):
             positions=response.meta['positions'],
             timelist=response.meta['timelist'],
             priority=removeunicode(response.meta['priority']),
-            seasonstakes=response.meta['seasonstakes']
+            seasonstakes=response.meta['seasonstakes'],
+            runners_list=self.runners_list,
         )
 
     def parse_tips(self, response):

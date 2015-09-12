@@ -13,6 +13,7 @@ class HorseItem(scrapy.Item):
     racecoursecode = scrapy.Field()
     raceclass = scrapy.Field()
     racerating = scrapy.Field()
+    runners_list = scrapy.Field()
     racegoing = scrapy.Field()
     racesurface = scrapy.Field()
     trackvariant= scrapy.Field()
@@ -43,12 +44,18 @@ class HorseItem(scrapy.Item):
     positions = scrapy.Field()
     timelist = scrapy.Field()
     priority = scrapy.Field()
+    raceday_id = scrapy.Field()
+    owner_id = scrapy.Field()
+    jockey_id = scrapy.Field()
+    trainer_id = scrapy.Field()
+    horse_id = scrapy.Field()
+    race_id = scrapy.Field()
 #SECOND
 class RaceItem(scrapy.Item):
     #to rd_Race
     racedate = scrapy.Field() #rd_raceid
     racenumber = scrapy.Field()
-    racecoursecode =scrapy.Field()
+    racecoursecode = scrapy.Field()
    
     horsename = scrapy.Field() #rd_horse_id
     tips = scrapy.Field()

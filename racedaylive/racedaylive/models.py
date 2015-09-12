@@ -167,33 +167,33 @@ class Race(Base):
         backref=backref('races', lazy='dynamic'))
     __table_args__ = (UniqueConstraint('raceday_id', 'racenumber'),)
     
-    def __init__(self, racedate, racecoursecode, racenumber, racename, raceclass, racerating, racegoing,racesurface, racedistance, utcracetime,
-        marketorder, result, winodds, favpos, favodds, norunners, f4, tierce, qtt, dt, tt, ttc, sixup, sixupc
-        ):
-        self.racedate = racedate
-        self.racecoursecode = racecoursecode
-        self.racenumber = racenumber
-        self.racename = racename
-        self.raceclass = raceclass
-        self.racerating = racerating
-        self.racegoing = racegoing
-        self.racesurface = racesurface
-        self.racedistance = racedistance
-        self.utcracetime = utcracetime
-        self.marketorder = marketorder
-        self.result= result
-        self.winodds = winodds
-        self.favpos = favpos
-        self.favodds = favodds
-        self.norunners = norunners
-        self.f4 = f4
-        self.tierce = tierce
-        self.qtt = qtt
-        self.dt = dt
-        self.tt  = tt
-        self.ttc = ttc
-        self.sixup = sixup
-        self.sixupc = sixupc
+#     def __init__(self, racedate, racecoursecode, racenumber, racename, raceclass, racerating, racegoing,racesurface, racedistance, utcracetime,
+#         marketorder, result, winodds, favpos, favodds, norunners, f4, tierce, qtt, dt, tt, ttc, sixup, sixupc
+#         ):
+#         self.racedate = racedate
+#         self.racecoursecode = racecoursecode
+#         self.racenumber = racenumber
+#         self.racename = racename
+#         self.raceclass = raceclass
+#         self.racerating = racerating
+#         self.racegoing = racegoing
+#         self.racesurface = racesurface
+#         self.racedistance = racedistance
+#         self.utcracetime = utcracetime
+#         self.marketorder = marketorder
+#         self.result= result
+#         self.winodds = winodds
+#         self.favpos = favpos
+#         self.favodds = favodds
+#         self.norunners = norunners
+#         self.f4 = f4
+#         self.tierce = tierce
+#         self.qtt = qtt
+#         self.dt = dt
+#         self.tt  = tt
+#         self.ttc = ttc
+#         self.sixup = sixup
+#         self.sixupc = sixupc
   
   ##results go in r_runner same index
 class Runner(Base):

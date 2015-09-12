@@ -127,6 +127,7 @@ def get_or_create_pl(model, indexfields, **kwargs):
 #     session.close()
 #     return instance, created
 
+
 class RacedaylivePipelineHorseItem(object):
 
     def process_item(self, item, spider):
@@ -158,6 +159,27 @@ class RacedaylivePipelineHorseItem(object):
         jockey_params = get_params(models.Jockey, item)
         jockey = get_or_create_pl(models.Jockey, jockey_unique, **jockey_params)
         print jockey
+
+        raceday_unique = get_unique(models.Raceday, item)
+        raceday_params = get_params(models.Raceday, item)
+        raceday = get_or_create_pl(models.Raceday, raceday_unique, **raceday_params)
+        print raceday
+
+        item['raceday_id'] = raceday.id
+        race_unique = get_unique(models.Race, item)
+        race_params = get_params(models.Race, item)
+        race = get_or_create_pl(models.Race, race_unique, **race_params)
+        print race
+
+        item['owner_id'] = owner.id
+        item['jockey_id'] = jockey.id
+        item['trainer_id'] = trainer.id
+        item['horse_id'] = horse.id
+        item['race_id'] = race.id
+        runner_unique = get_unique(models.Runner, item)
+        runner_params = get_params(models.Runner, item)
+        runner = get_or_create_pl(models.Runner, runner_unique, **runner_params)
+        print runner
 
 
 class RacedaylivePipeline(object):

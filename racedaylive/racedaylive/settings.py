@@ -12,7 +12,6 @@ from datetime import datetime
 BOT_NAME = 'racedaylive'
 
 ITEM_PIPELINES = {
-	
 	"racedaylive.pipelines.RacedaylivePipelineHorseItem":100,
 	# "racedaylive.pipeline2.SQLAlchemyPipeline":50
 }
