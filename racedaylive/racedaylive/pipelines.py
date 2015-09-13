@@ -160,38 +160,20 @@ class RacedaylivePipelineHorseItem(object):
             return
 
         owner = get_or_create_pl(models.Owner, item)
-        print owner
-        print owner.id
-
         horse = get_or_create_pl(models.Horse, item)
-        print horse
-        print horse.id
-
         trainer = get_or_create_pl(models.Trainer, item)
-        print trainer
-        print trainer.id
-
         jockey = get_or_create_pl(models.Jockey, item)
-        print jockey
-        print jockey.id
-
         raceday = get_or_create_pl(models.Raceday, item)
-        print raceday
-        print raceday.id
  
         item['raceday_id'] = raceday.id
         race = get_or_create_pl(models.Race, item)
-        print race
-        print race.id, item['racenumber'], race.racenumber
  
         item['owner_id'] = owner.id
         item['jockey_id'] = jockey.id
         item['trainer_id'] = trainer.id
         item['horse_id'] = horse.id
         item['race_id'] = race.id
-        runner = get_or_create_pl(models.Runner, item)
-        print runner
-        print runner.id
+        get_or_create_pl(models.Runner, item)
 
 
 class RacedaylivePipeline(object):
