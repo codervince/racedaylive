@@ -54,27 +54,42 @@ Race raceday_id
 
 ENGINE = models.get_engine()
 
-def get_or_create_pl(model, indexfields, unique_together, **kwargs):
+def get_or_create_pl(model, item):
+
     '''
     indexfields should be a dict of the uniqur fields for lookup
     '''
+
+    get_params = lambda model, item: {c.name: item.get(c.name) 
+        for c in model.__table__.columns if c.name != 'id'}
+    get_unique = lambda model, item: {c.name: item.get(c.name) 
+        for c in model.__table__.columns if c.name != 'id' and getattr(c, 'unique')}
+    get_unique_together = lambda model, item: [{c.name: item.get(c.name) 
+        for c in model.__table_args__[0].columns} 
+        for targ in model.__table_args__ if isinstance(
+        targ, sqlalchemy.UniqueConstraint)]
+
     session = Session(bind=ENGINE)
+
     instance = None
-    for k, v in indexfields.iteritems():
+    unique = get_unique(model, item)
+    for k, v in unique.iteritems():
         query = session.query(model).filter_by(**{k: v})
         instance = query.first()
         if instance:
             break
 
     if not instance:
+        unique_together = get_unique_together(model, item)
         for params in unique_together:
             query = session.query(model).filter_by(**params)
             instance = query.first()
             if instance:
                 break
-        
+
     created = False
     if not instance:
+        kwargs = get_params(model, item)
         params = dict(
             (k, v) for k, v in kwargs.iteritems()
             if not isinstance(v, ClauseElement))
@@ -85,10 +100,6 @@ def get_or_create_pl(model, indexfields, unique_together, **kwargs):
             session.add(instance)
             session.commit()
             created = True
-        except IntegrityError:
-            session.rollback()
-            instance = query.one()
-            created = False
         except Exception:
             session.close()
             raise
@@ -148,68 +159,37 @@ class RacedaylivePipelineHorseItem(object):
         if not isinstance(item, items.HorseItem):
             return
 
-        get_params = lambda model, item: {c.name: item.get(c.name) 
-            for c in model.__table__.columns if c.name != 'id'}
-        get_unique = lambda model, item: {c.name: item.get(c.name) 
-            for c in model.__table__.columns if c.name != 'id' and getattr(c, 'unique')}
-        get_unique_together = lambda model, item: [{c.name: item.get(c.name) 
-            for c in model.__table_args__[0].columns} 
-            for targ in model.__table_args__ if isinstance(
-            targ, sqlalchemy.UniqueConstraint)]
-
-        owner_unique = get_unique(models.Owner, item)
-        owner_unique_together = get_unique_together(models.Owner, item)
-        owner_params = get_params(models.Owner, item)
-        owner = get_or_create_pl(models.Owner, owner_unique, owner_unique_together, **owner_params)
+        owner = get_or_create_pl(models.Owner, item)
         print owner
         print owner.id
 
-        horse_unique = get_unique(models.Horse, item)
-        horse_unique_together = get_unique_together(models.Horse, item)
-        horse_params = get_params(models.Horse, item)
-        horse = get_or_create_pl(models.Horse, horse_unique, horse_unique_together, **horse_params)
+        horse = get_or_create_pl(models.Horse, item)
         print horse
         print horse.id
 
-        trainer_unique = get_unique(models.Trainer, item)
-        trainer_unique_together = get_unique_together(models.Trainer, item)
-        trainer_params = get_params(models.Trainer, item)
-        trainer = get_or_create_pl(models.Trainer, trainer_unique, trainer_unique_together, **trainer_params)
+        trainer = get_or_create_pl(models.Trainer, item)
         print trainer
         print trainer.id
- 
-        jockey_unique = get_unique(models.Jockey, item)
-        jockey_unique_together = get_unique_together(models.Jockey, item)
-        jockey_params = get_params(models.Jockey, item)
-        jockey = get_or_create_pl(models.Jockey, jockey_unique, jockey_unique_together, **jockey_params)
+
+        jockey = get_or_create_pl(models.Jockey, item)
         print jockey
         print jockey.id
- 
-        raceday_unique = get_unique(models.Raceday, item)
-        raceday_unique_together = get_unique_together(models.Raceday, item)
-        raceday_params = get_params(models.Raceday, item)
-        raceday = get_or_create_pl(models.Raceday, raceday_unique, raceday_unique_together, **raceday_params)
+
+        raceday = get_or_create_pl(models.Raceday, item)
         print raceday
         print raceday.id
  
         item['raceday_id'] = raceday.id
-        race_unique = get_unique(models.Race, item)
-        race_unique_together = get_unique_together(models.Race, item)
-        race_params = get_params(models.Race, item)
-        race = get_or_create_pl(models.Race, race_unique, race_unique_together, **race_params)
+        race = get_or_create_pl(models.Race, item)
         print race
         print race.id, item['racenumber'], race.racenumber
-        print race_unique
  
         item['owner_id'] = owner.id
         item['jockey_id'] = jockey.id
         item['trainer_id'] = trainer.id
         item['horse_id'] = horse.id
         item['race_id'] = race.id
-        runner_unique = get_unique(models.Runner, item)
-        runner_unique_together = get_unique_together(models.Runner, item)
-        runner_params = get_params(models.Runner, item)
-        runner = get_or_create_pl(models.Runner, runner_unique, runner_unique_together, **runner_params)
+        runner = get_or_create_pl(models.Runner, item)
         print runner
         print runner.id
 
