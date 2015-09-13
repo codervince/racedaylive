@@ -242,37 +242,37 @@ class Runner(Base):
 
     __table_args__ = (UniqueConstraint('race_id', 'horse_id'),)
 
-    def __init__(self, race_id, horsenumber, horse_id, jockey_id, trainer_id, owner_id,
-        todaysrating, lastwonat, isMaiden, seasonstakes, draw, priority, gear,placing, finish_time,
-        marginsbehindleader, positions, timelist,scmp_runner_comment, barriertimes, 
-        jumptimes,totalbarrier, totalcanter, totaljump, totalswim, isScratched=False,):
-        self.race_id = race_id
-        self.horsenumber = horsenumber
-        self.horse_id = horse_id
-        self.trainer_id = trainer_id
-        self.jockey_id = jockey_id
-        self.owner_id = owner_id
-    
-        self.todaysrating = todaysrating
-        self.lastwonat= lastwonat
-        self.isMaiden = isMaiden
-        self.seasonstakes = seasonstakes
-        self.draw= draw
-        self.isScratched = isScratched
-        self.priority = priority
-        self.gear = gear
-        self.placing = placing
-        self.finish_time = finish_time
-        self.marginsbehindleader = marginsbehindleader
-        self.positions = positions
-        self.timelist = timelist
-        self.scmp_runner_comment = scmp_runner_comment
-        self.barriertimes = barriertimes
-        self.jumptimes = jumptimes
-        self.totalbarrier = totalbarrier
-        self.totalcanter = totalcanter
-        self.totaljump = totaljump
-        self.totalswim =totalswim 
+#     def __init__(self, race_id, horsenumber, horse_id, jockey_id, trainer_id, owner_id,
+#         todaysrating, lastwonat, isMaiden, seasonstakes, draw, priority, gear,placing, finish_time,
+#         marginsbehindleader, positions, timelist,scmp_runner_comment, barriertimes, 
+#         jumptimes,totalbarrier, totalcanter, totaljump, totalswim, isScratched=False,):
+#         self.race_id = race_id
+#         self.horsenumber = horsenumber
+#         self.horse_id = horse_id
+#         self.trainer_id = trainer_id
+#         self.jockey_id = jockey_id
+#         self.owner_id = owner_id
+#     
+#         self.todaysrating = todaysrating
+#         self.lastwonat= lastwonat
+#         self.isMaiden = isMaiden
+#         self.seasonstakes = seasonstakes
+#         self.draw= draw
+#         self.isScratched = isScratched
+#         self.priority = priority
+#         self.gear = gear
+#         self.placing = placing
+#         self.finish_time = finish_time
+#         self.marginsbehindleader = marginsbehindleader
+#         self.positions = positions
+#         self.timelist = timelist
+#         self.scmp_runner_comment = scmp_runner_comment
+#         self.barriertimes = barriertimes
+#         self.jumptimes = jumptimes
+#         self.totalbarrier = totalbarrier
+#         self.totalcanter = totalcanter
+#         self.totaljump = totaljump
+#         self.totalswim =totalswim 
 
 # ### tipster
 # class t_System(db.Model):
