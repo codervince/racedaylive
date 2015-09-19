@@ -88,21 +88,24 @@ def get_or_create_pl(model, item):
                 break
 
     created = False
+    kwargs = get_params(model, item)
+    params = dict(
+        (k, v) for k, v in kwargs.iteritems()
+        if not isinstance(v, ClauseElement))
     if not instance:
-        kwargs = get_params(model, item)
-        params = dict(
-            (k, v) for k, v in kwargs.iteritems()
-            if not isinstance(v, ClauseElement))
         #params.update(defaults)
         instance = model(**params)
+    else:
+        for k, v in params.iteritems():
+            setattr(instance, k, v)
 
-        try:
-            session.add(instance)
-            session.commit()
-            created = True
-        except Exception:
-            session.close()
-            raise
+    try:
+        session.add(instance)
+        session.commit()
+        created = True
+    except Exception:
+        session.close()
+        raise
 
     session.refresh(instance)  # Refreshing before session close
     session.close()
